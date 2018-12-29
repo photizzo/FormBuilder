@@ -1,7 +1,6 @@
 package ng.softcom.mobileui
 
 import android.os.Bundle
-import android.view.View
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -33,7 +32,6 @@ class FormActivity : FragmentActivity() {
         val pagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager)
         binding.pager.adapter = pagerAdapter
 
-        initFormControlButtons()
     }
 
     override fun onBackPressed() {
@@ -47,52 +45,6 @@ class FormActivity : FragmentActivity() {
         }
     }
 
-    private fun initFormControlButtons(){
-        //check if form is single page
-        when(currentPage){
-            1 -> {
-                binding.includedMiddlePageControl.parent.visibility = View.GONE
-                binding.includedLastPageControl.parent.visibility = View.GONE
-            }
-            numberOfPages -> {
-                binding.includedFirstPageControl.buttonNext.visibility = View.GONE
-                binding.includedMiddlePageControl.parent.visibility = View.GONE
-                //check if form is a single page form only show submit button
-                if(currentPage == 1 && numberOfPages == 1)
-                    binding.includedLastPageControl.buttonBack.visibility = View.GONE
-
-            }
-            else -> {
-                binding.includedFirstPageControl.buttonNext.visibility = View.GONE
-                binding.includedLastPageControl.parent.visibility = View.GONE
-            }
-        }
-
-        binding.includedFirstPageControl.buttonNext.setOnClickListener {
-            currentPage++
-            binding.pager.currentItem = currentPage
-        }
-        binding.includedMiddlePageControl.buttonBack.setOnClickListener {
-            currentPage--
-            binding.pager.currentItem = currentPage
-        }
-        binding.includedMiddlePageControl.buttonNext.setOnClickListener {
-            currentPage++
-            binding.pager.currentItem = currentPage
-        }
-        binding.includedLastPageControl.buttonBack.setOnClickListener {
-            currentPage--
-            binding.pager.currentItem = currentPage
-        }
-        binding.includedLastPageControl.buttonNext.setOnClickListener {
-            currentPage++
-            binding.pager.currentItem = currentPage
-        }
-
-        binding.textViewPageNumber.text = "$currentPage/$numberOfPages"
-
-    }
-
     /**
      * A simple pager adapter that represents 5 ScreenSlidePageFragment objects, in
      * sequence.
@@ -103,6 +55,7 @@ class FormActivity : FragmentActivity() {
         override fun getItem(position: Int): Fragment = FormFragment()
     }
 
+    //todo:remove save instance state and restore save instance state
     override fun onSaveInstanceState(savedInstanceState: Bundle?) {
         savedInstanceState ?: return
 
@@ -123,9 +76,7 @@ class FormActivity : FragmentActivity() {
         }
         super.onRestoreInstanceState(savedInstanceState)
 
-
     }
-
 
     companion object {
         const val NUM_PAGES_KEY = "num_pages"
