@@ -40,8 +40,8 @@ class FormFragment : Fragment() {
     private fun initRecyclerView(){
         val llm = LinearLayoutManager(activity)
         binding.recyclerViewSection.layoutManager = llm
-        val sectionAdapter = FormSectionAdapter(listOf(Form(1), Form(2), Form(3))) {
-
+        val sectionAdapter = FormSectionAdapter(listOf()) {
+            //doing nothing here
         }
         binding.recyclerViewSection.adapter = sectionAdapter
     }

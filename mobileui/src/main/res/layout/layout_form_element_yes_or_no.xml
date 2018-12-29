@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginTop="8dp"
+    android:layout_marginRight="16dp"
+    android:layout_marginLeft="16dp"
+    android:layout_marginBottom="8dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Label"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:textColor="@color/textBlack" />
+
+    <RadioGroup
+        android:id="@+id/radiogroup_yes_or_no"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        >
+        <RadioButton
+            android:id="@+id/radioButton_yes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/nunito_bold"
+            android:text="Yes"
+            android:checked="true"
+            android:padding="8dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
+
+        <RadioButton
+            android:id="@+id/radioButton_no"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No"
+            android:padding="8dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
+
+    </RadioGroup>
+
+</LinearLayout>
