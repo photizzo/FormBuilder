@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/button_next"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp"
+        android:elevation="4dp"
+        android:fontFamily="@font/nunito_bold"
+        android:background="@drawable/button_rounded"
+        android:textColor="@android:color/white"
+        android:text="NEXT" />
+</layout>
+
+
