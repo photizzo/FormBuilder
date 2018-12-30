@@ -1,68 +1,86 @@
 package ng.softcom.mobileui
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
+import dagger.android.support.AndroidSupportInjection
 import ng.softcom.mobileui.adapters.FormSectionAdapter
 import ng.softcom.mobileui.databinding.FragmentFormPageBinding
-import ng.softcom.mobileui.utils.DataFactory
-
+import ng.softcom.presentation.viewmodel.GetFormViewModel
 
 class FormFragment : Fragment() {
 
-    /**
-     * @numberOfPages The number of pages to show in this form.
-     * @currentPage the currentPage user is on the form.
-     * todo:replace this with live data
-     */
-    private var numberOfPages = 1
-    private var currentPage = 1
+    private lateinit var getFormViewModel: GetFormViewModel
 
+    private lateinit var binding: FragmentFormPageBinding
 
-    private lateinit var binding:FragmentFormPageBinding
+    override fun onAttach(context: Context) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_form_page,
-            container, false)
+        binding = DataBindingUtil.inflate(
+            inflater, R.layout.fragment_form_page,
+            container, false
+        )
 
-        initRecyclerView()
+        initViewModel()
         initFormControlButtons()
+
         return binding.root
     }
 
-    private fun initRecyclerView(){
+    private fun initViewModel() {
+        getFormViewModel = activity?.run {
+            ViewModelProviders.of(this).get(GetFormViewModel::class.java)
+        } ?: throw Exception("Invalid Activity")
+
+        initFormSectionRecyclerView()
+    }
+
+    private fun initFormSectionRecyclerView() {
         val llm = LinearLayoutManager(activity)
         binding.recyclerViewSection.layoutManager = llm
-        val sectionAdapter = FormSectionAdapter(DataFactory.form.pages[0].section) {
+        val currentPage = arguments?.getInt(getString(R.string.page_position_key))
+        val formSections = getFormViewModel.getFormLiveData().value?.data!!.pages[currentPage!!].section
+        val sectionAdapter = FormSectionAdapter(formSections) {
             //doing nothing here
         }
         binding.recyclerViewSection.adapter = sectionAdapter
     }
 
+    private fun initFormControlButtons() {
+        val currentPage = arguments?.getInt(getString(R.string.page_position_key))
+        val numberOfPages = getFormViewModel.getFormLiveData().value?.data?.pages?.size!! - 1
 
-
-    private fun initFormControlButtons(){
-        //check if form is single page
-        when(currentPage){
+        when (currentPage) {
+            //last page
             numberOfPages -> {
                 binding.includedFirstPageControl.buttonNext.visibility = View.GONE
                 binding.includedMiddlePageControl.parent.visibility = View.GONE
                 //check if form is a single page form only show submit button
-                if(currentPage == 1 && numberOfPages == 1)
+                if (getFormViewModel.getCurrentPageLiveData().value == 1
+                    && getFormViewModel.getFormLiveData().value?.data?.pages?.size == 1
+                )
                     binding.includedLastPageControl.buttonBack.visibility = View.GONE
-
             }
-            1 -> {
+            //first page
+            0 -> {
                 binding.includedMiddlePageControl.parent.visibility = View.GONE
                 binding.includedLastPageControl.parent.visibility = View.GONE
             }
+            //middle pages
             else -> {
                 binding.includedFirstPageControl.buttonNext.visibility = View.GONE
                 binding.includedLastPageControl.parent.visibility = View.GONE
@@ -70,20 +88,20 @@ class FormFragment : Fragment() {
         }
 
         binding.includedFirstPageControl.buttonNext.setOnClickListener {
-            currentPage++
+            getFormViewModel.incrementCurrentPage()
         }
         binding.includedMiddlePageControl.buttonBack.setOnClickListener {
-            currentPage--
+            getFormViewModel.decrementCurrentPage()
         }
         binding.includedMiddlePageControl.buttonNext.setOnClickListener {
-            currentPage++
+            getFormViewModel.incrementCurrentPage()
         }
         binding.includedLastPageControl.buttonBack.setOnClickListener {
-            currentPage--
+            getFormViewModel.decrementCurrentPage()
         }
-        binding.includedLastPageControl.buttonNext.setOnClickListener {
-            currentPage++
-        }
+        binding.includedLastPageControl.buttonSubmit.setOnClickListener {
 
+        }
     }
+
 }

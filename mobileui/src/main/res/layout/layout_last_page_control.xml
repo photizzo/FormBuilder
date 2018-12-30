@@ -22,7 +22,7 @@
             android:textColor="@android:color/white" />
 
         <androidx.appcompat.widget.AppCompatButton xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/button_next"
+            android:id="@+id/button_submit"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"

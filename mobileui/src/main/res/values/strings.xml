@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">mobileui</string>
+    <string name="page_position_key">position</string>
 </resources>

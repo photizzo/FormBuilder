@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 android {
     compileSdkVersion Versions.androidCompileSdkVersion
 
@@ -25,6 +26,9 @@ android {
 }
 
 dependencies {
+    implementation project(':domain')
+    implementation project(':data')
+    implementation project(':presentation')
     implementation project(':models')
 
     implementation MobileUiDependencies.javaxAnnotation
@@ -46,6 +50,21 @@ dependencies {
     implementation MobileUiDependencies.appCompatV7
     implementation MobileUiDependencies.gson
     implementation MobileUiDependencies.rxRelay
+    implementation MobileUiDependencies.dagger
+    implementation MobileUiDependencies.daggerAndroid
+    implementation MobileUiDependencies.daggerSupport
+
+    kapt MobileUiDependencies.daggerCompiler
+    kapt MobileUiDependencies.daggerProcessor
+
+    kaptTest MobileUiDependencies.daggerCompiler
+    kaptAndroidTest MobileUiDependencies.daggerCompiler
+
+    
+    implementation PresentationDependencies.archRuntime
+    implementation PresentationDependencies.archExtensions
+    implementation PresentationDependencies.roomRxJava
+    kapt PresentationDependencies.archCompiler
 
     implementation 'androidx.appcompat:appcompat:1.0.0-alpha1'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.2'

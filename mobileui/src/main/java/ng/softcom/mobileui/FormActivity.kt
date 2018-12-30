@@ -3,35 +3,50 @@ package ng.softcom.mobileui
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import dagger.android.support.DaggerAppCompatActivity
 import ng.softcom.mobileui.databinding.ActivityFormBinding
+import ng.softcom.mobileui.injection.ViewModelFactory
+import ng.softcom.models.Form
+import ng.softcom.presentation.state.Resource
+import ng.softcom.presentation.state.ResourceState
+import ng.softcom.presentation.viewmodel.GetFormViewModel
+import javax.inject.Inject
 
 
-class FormActivity : FragmentActivity() {
+class FormActivity : DaggerAppCompatActivity() {
 
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    private lateinit var getFormViewModel: GetFormViewModel
 
-    lateinit var binding:ActivityFormBinding
-
-    /**
-     * @numberOfPages The number of pages to show in this form.
-     * @currentPage the currentPage user is on the form.
-     * todo:replace this with live data
-     */
-    private var numberOfPages = 3 //default is
-    private var currentPage = 1
+    lateinit var binding: ActivityFormBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_form)
 
-        //pager variable is the id of the viewpager in xml since using kotlin extensions no need for findviewbyId
-        binding.pager.setMyScroller() //enable smooth scroll on non-swipeableViewPager
-        // The pager adapter, which provides the pages to the view pager widget.
-        val pagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager)
-        binding.pager.adapter = pagerAdapter
+        initViewModel()
+    }
 
+    private fun initViewModel() {
+        getFormViewModel = ViewModelProviders.of(this, viewModelFactory)
+            .get(GetFormViewModel::class.java)
+        getFormViewModel.getFormLiveData().observe(this, Observer<Resource<Form>> {
+            it?.let {
+                handleFormDataState(it)
+            }
+        })
+
+        getFormViewModel.getCurrentPageLiveData().observe(this, Observer<Int> {
+            it?.let {
+                handleCurrentPageDataState(it)
+            }
+        })
+        getFormViewModel.getFormData()
     }
 
     override fun onBackPressed() {
@@ -46,40 +61,49 @@ class FormActivity : FragmentActivity() {
     }
 
     /**
-     * A simple pager adapter that represents 5 ScreenSlidePageFragment objects, in
-     * sequence.
+     * A simple pager adapter helps manage the form pages in sequence
      */
-    private inner class ScreenSlidePagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {
-        override fun getCount(): Int = numberOfPages
+    private inner class FormPagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {
 
-        override fun getItem(position: Int): Fragment = FormFragment()
-    }
+        override fun getCount(): Int = getFormViewModel.getFormLiveData().value?.data?.pages?.size!!
 
-    //todo:remove save instance state and restore save instance state
-    override fun onSaveInstanceState(savedInstanceState: Bundle?) {
-        savedInstanceState ?: return
+        override fun getItem(position: Int): Fragment {
+            val bundle = Bundle()
+            bundle.putInt(getString(R.string.page_position_key), position)
+            val fragment  = FormFragment()
+            fragment.arguments = bundle
 
-        with(savedInstanceState) {
-            // Save whether the address has been requested.
-            putInt(NUM_PAGES_KEY, numberOfPages)
-            putInt(CURRENT_PAGE_KEY, currentPage)
+            return fragment
         }
-        super.onSaveInstanceState(savedInstanceState)
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
-        savedInstanceState?: return
+    private fun initFormViewPager() {
+        binding.pager.setMyScroller() //enable smooth scroll on non-swipeableViewPager
+        // The pager adapter, which provides the pages to the view pager widget.
+        val pagerAdapter = FormPagerAdapter(supportFragmentManager)
+        binding.pager.adapter = pagerAdapter
+    }
 
-        with(savedInstanceState){
-            numberOfPages = getInt(NUM_PAGES_KEY)
-            currentPage = getInt(CURRENT_PAGE_KEY)
+    private fun handleFormDataState(resource: Resource<Form>) {
+        when (resource.status) {
+            ResourceState.SUCCESS -> {
+                getFormViewModel.getCurrentPageLiveData().value = 0//initialize current page to page 1
+                initFormViewPager()
+            }
+            ResourceState.LOADING -> {
+                //show progress bar
+            }
+            ResourceState.ERROR -> {
+                //show error toast
+            }
         }
-        super.onRestoreInstanceState(savedInstanceState)
-
     }
 
-    companion object {
-        const val NUM_PAGES_KEY = "num_pages"
-        const val CURRENT_PAGE_KEY = "current_page"
+    private fun handleCurrentPageDataState(pageNumber: Int) {
+        val numOfPages = getFormViewModel.getFormLiveData().value?.data?.pages?.size
+        binding.textViewPageNumber.text = "${pageNumber + 1}/$numOfPages"
+
+        //move to the next page
+        binding.pager.currentItem = pageNumber
     }
 }

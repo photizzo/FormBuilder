@@ -1,4 +1,4 @@
-package ng.softcom.mobileui.utils
+package ng.softcom.data.utils
 
 import ng.softcom.models.*
 
@@ -10,9 +10,9 @@ object DataFactory {
     val formElements5 =  FormElementYesOrNo("Text", true, "unique", listOf(), null)
 
     val section = FormSection("FormSection " , listOf(formElements1, formElements2, formElements3, formElements4, formElements5))
-    val formPage = FormPage("Form Pages", listOf(section, section))
+    val formPage = FormPage("Form Pages", listOf(section, section, section, section))
 
-    val form = Form("Form", listOf(formPage, formPage, formPage))
+    val form = Form("Form", listOf(formPage, formPage, formPage, formPage, formPage))
 
 
 }
