@@ -1,0 +1,19 @@
+apply plugin: 'kotlin'
+
+dependencies {
+    implementation project(':domain')
+    implementation project(':models')
+
+    implementation DataDependencies.javaxAnnotation
+    implementation DataDependencies.kotlin
+    implementation DataDependencies.javaxInject
+    implementation DataDependencies.rxKotlin
+
+    testImplementation DataTestDependencies.junit
+    testImplementation DataTestDependencies.kotlinJUnit
+    testImplementation DataTestDependencies.mockito
+    testImplementation DataTestDependencies.assertj
+}
+
+sourceCompatibility = "7"
+targetCompatibility = "7"
