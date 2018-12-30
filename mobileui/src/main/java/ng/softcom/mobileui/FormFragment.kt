@@ -88,13 +88,13 @@ class FormFragment : Fragment() {
         }
 
         binding.includedFirstPageControl.buttonNext.setOnClickListener {
-            getFormViewModel.incrementCurrentPage()
+            if(isAllMandatoryQuesitionsAreAnswered()) getFormViewModel.incrementCurrentPage()
         }
         binding.includedMiddlePageControl.buttonBack.setOnClickListener {
             getFormViewModel.decrementCurrentPage()
         }
         binding.includedMiddlePageControl.buttonNext.setOnClickListener {
-            getFormViewModel.incrementCurrentPage()
+            if(isAllMandatoryQuesitionsAreAnswered()) getFormViewModel.incrementCurrentPage()
         }
         binding.includedLastPageControl.buttonBack.setOnClickListener {
             getFormViewModel.decrementCurrentPage()
@@ -102,6 +102,11 @@ class FormFragment : Fragment() {
         binding.includedLastPageControl.buttonSubmit.setOnClickListener {
 
         }
+    }
+
+    private fun isAllMandatoryQuesitionsAreAnswered():Boolean{
+
+        return true
     }
 
 }

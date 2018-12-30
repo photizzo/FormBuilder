@@ -1,7 +1,10 @@
 package ng.softcom.mobileui.adapters
 
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RadioButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputEditText
@@ -12,7 +15,7 @@ import ng.softcom.mobileui.utils.inflate
 import ng.softcom.models.*
 
 class FormElementAdapter(
-    private var items: List<FormElement>,
+    var items: List<FormElement>,
     private val listener: (FormElement) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -60,65 +63,99 @@ class FormElementAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when(items[position].formType){
             FormElementType.YES_OR_NO -> {
-                (holder as YesOrNoViewHolder).bind(items[position], listener)
+                (holder as YesOrNoViewHolder).bind(position)
             }
             FormElementType.EMBEDDED_PHOTO -> {
-                (holder as PhotoViewHolder).bind(items[position], listener)
+                (holder as PhotoViewHolder).bind(position)
             }
             FormElementType.FORMATTED_NUMERIC -> {
-                (holder as NumberViewHolder).bind(items[position], listener)
+                (holder as NumberViewHolder).bind(position)
             }
             FormElementType.DATE_TIME -> {
-                (holder as DateAndTimeViewHolder).bind(items[position], listener)
+                (holder as DateAndTimeViewHolder).bind(position)
             }
             else -> {
-                (holder as TextViewHolder).bind(items[position], listener)
+                (holder as TextViewHolder).bind(position)
             }
         }
     }
 
     override fun getItemCount(): Int = items.size
 
-    class TextViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val inputTextView: TextInputEditText = itemView.findViewById(R.id.input_text)
+    inner class TextViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val inputText: TextInputEditText = itemView.findViewById(R.id.input_text)
         private val inputLayout: TextInputLayout = itemView.findViewById(R.id.input_layout)
-        fun bind(item: FormElement, listener: (FormElement) -> Unit) = with(itemView) {
-            inputLayout.hint = (item as FormElementText).label
+        fun bind(position: Int) = with(itemView) {
+            inputLayout.hint = (items[position] as FormElementText).label
+            inputText.addTextChangedListener(object : TextWatcher {
+                override fun afterTextChanged(s: Editable?) {
+
+                }
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+                }
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    (items[position] as FormElementText).userResponse = s.toString()
+                }
+            })
         }
     }
 
-    class YesOrNoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class YesOrNoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val sectionNameTv: TextView = itemView.findViewById(R.id.textview_label)
-        fun bind(item: FormElement, listener: (FormElement) -> Unit) = with(itemView) {
-            sectionNameTv.text = (item as FormElementYesOrNo).label
-
+        private val yesRadioButton: RadioButton = itemView.findViewById(R.id.radioButton_yes)
+        fun bind(position: Int) = with(itemView) {
+            sectionNameTv.text = (items[position] as FormElementYesOrNo).label
+            (items[position] as FormElementYesOrNo).userResponseIsYes = yesRadioButton.isChecked
         }
     }
 
-    class DateAndTimeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val inputTextView: TextInputEditText = itemView.findViewById(R.id.input_text)
+    inner class DateAndTimeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val inputText: TextInputEditText = itemView.findViewById(R.id.input_text)
         private val inputLayout: TextInputLayout = itemView.findViewById(R.id.input_layout)
         private val selectDate: TextView = itemView.findViewById(R.id.textView_select_date)
-        fun bind(item: FormElement, listener: (FormElement) -> Unit) = with(itemView) {
-            inputLayout.hint = (item as FormElementDateAndTime).label
+        fun bind(position: Int) = with(itemView) {
+            inputLayout.hint = (items[position] as FormElementDateAndTime).label
             setOnClickListener {
 
             }
+            inputText.addTextChangedListener(object : TextWatcher {
+                override fun afterTextChanged(s: Editable?) {
+
+                }
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+                }
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    (items[position] as FormElementDateAndTime).userResponse = s.toString()
+                }
+            })
         }
     }
 
-    class PhotoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class PhotoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val photo: CircleImageView = itemView.findViewById(R.id.imageview_photo)
-        fun bind(item: FormElement, listener: (FormElement) -> Unit) = with(itemView) {
+        fun bind(position: Int) = with(itemView) {
 
         }
     }
 
-    class NumberViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val inputTextView: TextInputEditText = itemView.findViewById(R.id.input_text)
+    inner class NumberViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val inputText: TextInputEditText = itemView.findViewById(R.id.input_text)
         private val inputLayout: TextInputLayout = itemView.findViewById(R.id.input_layout)
-        fun bind(item: FormElement, listener: (FormElement) -> Unit) = with(itemView) {
-            inputLayout.hint = (item as FormElementFormattedNumeric).label
+        fun bind(position: Int) = with(itemView) {
+            inputLayout.hint = (items[position] as FormElementFormattedNumeric).label
+            inputText.addTextChangedListener(object : TextWatcher {
+                override fun afterTextChanged(s: Editable?) {
+
+                }
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+                }
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    (items[position] as FormElementFormattedNumeric).userResponse = s.toString()
+                }
+            })
         }
     }
 
