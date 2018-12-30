@@ -9,6 +9,3 @@ dependencies {
     testImplementation DomainTestDependencies.assertj
     testImplementation DomainTestDependencies.junit
 }
-
-sourceCompatibility = "7"
-targetCompatibility = "7"

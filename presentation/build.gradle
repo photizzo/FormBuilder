@@ -1,0 +1,77 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion = Versions.androidCompileSdkVersion
+    buildToolsVersion = Versions.androidBuildToolsVersion
+
+
+    defaultConfig {
+        minSdkVersion Versions.androidMinSdkVersion
+        targetSdkVersion Versions.androidTargetSdkVersion
+        multiDexEnabled = true
+    }
+
+    dexOptions {
+        preDexLibraries = false
+        dexInProcess = false
+        javaMaxHeapSize "4g"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    packagingOptions {
+        exclude 'LICENSE.txt'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+    }
+
+    lintOptions {
+        quiet true
+        abortOnError false
+        ignoreWarnings true
+        disable 'InvalidPackage'            //Some libraries have issues with this.
+        disable 'OldTargetApi'              //Lint gives this warning but SDK 20 would be Android L Beta.
+        disable 'IconDensities'             //For testing purpose. This is safe to remove.
+        disable 'IconMissingDensityFolder'  //For testing purpose. This is safe to remove.
+    }
+
+    testOptions {
+        unitTests.all {
+            jvmArgs '-noverify'
+        }
+    }
+}
+
+kapt {
+    correctErrorTypes = true
+    generateStubs = true
+}
+
+dependencies {
+
+    implementation project(':domain')
+    implementation project(':models')
+
+    implementation PresentationDependencies.kotlin
+    implementation PresentationDependencies.javaxInject
+    implementation PresentationDependencies.rxKotlin
+    implementation PresentationDependencies.rxAndroid
+    implementation PresentationDependencies.archRuntime
+    implementation PresentationDependencies.archExtensions
+    implementation RemoteDependencies.gson
+    kapt PresentationDependencies.archCompiler
+
+    testImplementation PresentationTestDependencies.junit
+    testImplementation PresentationTestDependencies.mockito
+    testImplementation PresentationTestDependencies.assertj
+    testImplementation PresentationTestDependencies.robolectric
+    testImplementation PresentationTestDependencies.archTesting
+
+}
