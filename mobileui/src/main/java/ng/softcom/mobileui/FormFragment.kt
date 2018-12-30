@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import ng.softcom.mobileui.adapters.FormSectionAdapter
 import ng.softcom.mobileui.databinding.FragmentFormPageBinding
-import ng.softcom.models.Form
+import ng.softcom.mobileui.utils.DataFactory
 
 
 class FormFragment : Fragment() {
@@ -40,11 +40,13 @@ class FormFragment : Fragment() {
     private fun initRecyclerView(){
         val llm = LinearLayoutManager(activity)
         binding.recyclerViewSection.layoutManager = llm
-        val sectionAdapter = FormSectionAdapter(listOf()) {
+        val sectionAdapter = FormSectionAdapter(DataFactory.form.pages[0].section) {
             //doing nothing here
         }
         binding.recyclerViewSection.adapter = sectionAdapter
     }
+
+
 
     private fun initFormControlButtons(){
         //check if form is single page

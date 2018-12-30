@@ -2,23 +2,19 @@ package ng.softcom.models
 
 data class Form(
     val label: String,
-    val pages: List<FormPages>
+    val pages: List<FormPage>
 )
 
-data class FormPages(
+data class FormPage(
     val label: String,
-    val section: List<Section>
+    val section: List<FormSection>
 )
 
-data class Section(
+data class FormSection(
     val label: String,
-    val elements: List<Elements>
+    val elements: List<FormElement>
 )
 
-data class Elements(
-    val label: String,
-    val formType: List<FormElement>
-)
 
 enum class FormElementType {
     YES_OR_NO, TEXT, EMBEDDED_PHOTO, FORMATTED_NUMERIC, DATE_TIME
@@ -59,8 +55,8 @@ data class FormElementFormattedNumeric(
 ) : FormElement(FormElementType.FORMATTED_NUMERIC)
 
 data class FormElementDateAndTime(
-    val mode: String,
     val label: String,
+    val mode: String,
     val isMandatory: Boolean,
     val uniqueId: String,
     val rules: List<Rules?>,
