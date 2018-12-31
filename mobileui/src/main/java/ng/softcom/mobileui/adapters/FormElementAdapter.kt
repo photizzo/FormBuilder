@@ -11,6 +11,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import de.hdodenhof.circleimageview.CircleImageView
 import ng.softcom.mobileui.R
+import ng.softcom.mobileui.injection.GlideApp
 import ng.softcom.mobileui.utils.inflate
 import ng.softcom.models.*
 
@@ -142,9 +143,13 @@ class FormElementAdapter(
     }
 
     inner class PhotoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val photo: CircleImageView = itemView.findViewById(R.id.imageview_photo)
+        private val imageview: CircleImageView = itemView.findViewById(R.id.imageview_photo)
         fun bind(position: Int) = with(itemView) {
-
+            GlideApp.with(context)
+                .load((items[position] as FormElementEmbeddedPhoto).file)
+                .centerCrop()
+                .placeholder(R.drawable.form_icon)
+                .into(imageview)
         }
     }
 
@@ -167,7 +172,6 @@ class FormElementAdapter(
             })
         }
     }
-
 
     companion object {
         private const val YES_OR_NO = 1

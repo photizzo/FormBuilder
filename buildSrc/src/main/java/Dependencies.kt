@@ -133,6 +133,7 @@ object Libraries {
     const val daggerProcessor = "com.google.dagger:dagger-android-processor:$daggerVersion"
     const val glassfishAnnotation = "org.glassfish:javax.annotation:$glassfishAnnotationVersion"
     const val glide = "com.github.bumptech.glide:glide:$glideVersion"
+    const val glideCompiler = "com.github.bumptech.glide:compiler:$glideVersion"
     const val annotationProcessor = "com.google.auto.value:auto-value:$annotationProcessorVersion"
     const val lottie = "com.airbnb.android:lottie:$lottieVersion"
     const val junit = "junit:junit:$jUnitVersion"
@@ -279,6 +280,7 @@ object MobileUiDependencies {
     const val rxKotlin = Libraries.rxKotlin
     const val rxAndroid = Libraries.rxAndroid
     const val glide = Libraries.glide
+    const val glideCompiler = Libraries.glideCompiler
     const val kotlin = Libraries.kotlin
     const val javaxAnnotation = Libraries.javaxAnnotation
     const val javaxInject = Libraries.javaxInject
