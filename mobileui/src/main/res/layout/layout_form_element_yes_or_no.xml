@@ -30,7 +30,6 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/nunito_bold"
             android:text="Yes"
-            android:checked="true"
             android:padding="8dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
 
