@@ -108,7 +108,7 @@ class FormElementAdapter(
             radibGroup.setOnCheckedChangeListener { group, checkedId ->
                 (items[position] as FormElementYesOrNo).userResponseIsYes =
                         checkedId == R.id.radioButton_yes
-//                listener(formSectionList)
+                listener(items)
             }
         }
     }
@@ -131,7 +131,7 @@ class FormElementAdapter(
                 }
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                     (items[position] as FormElementDateAndTime).userResponse = s.toString()
-//                    listener(formSectionList)//update the section formSectionList data
+                    listener(items)
                 }
             })
         }
@@ -156,7 +156,7 @@ class FormElementAdapter(
                 }
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                     (items[position] as FormElementFormattedNumeric).userResponse = s.toString()
-//                    listener(formSectionList)//update the section formSectionList data
+                    listener(items)
                 }
             })
         }
