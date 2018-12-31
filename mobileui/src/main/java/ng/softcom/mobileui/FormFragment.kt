@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.android.support.AndroidSupportInjection
 import ng.softcom.mobileui.adapters.FormSectionAdapter
 import ng.softcom.mobileui.databinding.FragmentFormPageBinding
+import ng.softcom.models.FormSection
 import ng.softcom.presentation.viewmodel.GetFormViewModel
 
 class FormFragment : Fragment() {
@@ -53,8 +54,9 @@ class FormFragment : Fragment() {
     private fun initFormSectionRecyclerView() {
         val llm = LinearLayoutManager(activity)
         binding.recyclerViewSection.layoutManager = llm
-        val currentPage = arguments?.getInt(getString(R.string.page_position_key))
-        val formSections = getFormViewModel.getFormLiveData().value?.data!!.pages[currentPage!!].section
+        val currentPagePosition = arguments?.getInt(getString(R.string.page_position_key))
+        val currentFormPage = getFormViewModel.getFormLiveData().value?.data!!.pages
+        val formSections = currentFormPage[currentPagePosition!!].section
         sectionAdapter = FormSectionAdapter(formSections) {
             //doing nothing here
         }
@@ -72,9 +74,8 @@ class FormFragment : Fragment() {
                 binding.includedMiddlePageControl.parent.visibility = View.GONE
                 //check if form is a single page form only show submit button
                 if (getFormViewModel.getCurrentPageLiveData().value == 1
-                    && getFormViewModel.getFormLiveData().value?.data?.pages?.size == 1
-                )
-                    binding.includedLastPageControl.buttonBack.visibility = View.GONE
+                    && getFormViewModel.getFormLiveData().value?.data?.pages?.size == 1)
+                        binding.includedLastPageControl.buttonBack.visibility = View.GONE
             }
             //first page
             0 -> {
@@ -89,26 +90,37 @@ class FormFragment : Fragment() {
         }
 
         binding.includedFirstPageControl.buttonNext.setOnClickListener {
-            if(isAllMandatoryQuesitionsAreAnsweredForCurrentPage()) getFormViewModel.incrementCurrentPage()
+            if(isAllMandatoryQuestionsAreAnsweredForCurrentPage(sectionAdapter.formSectionList)) {
+                updateCurrentPageFormSectionsWithUserInput(sectionAdapter.formSectionList)
+                getFormViewModel.incrementCurrentPage()
+            }
         }
         binding.includedMiddlePageControl.buttonBack.setOnClickListener {
             getFormViewModel.decrementCurrentPage()
         }
         binding.includedMiddlePageControl.buttonNext.setOnClickListener {
-            if(isAllMandatoryQuesitionsAreAnsweredForCurrentPage()) getFormViewModel.incrementCurrentPage()
+            if(isAllMandatoryQuestionsAreAnsweredForCurrentPage(sectionAdapter.formSectionList)){
+                updateCurrentPageFormSectionsWithUserInput(sectionAdapter.formSectionList)
+                getFormViewModel.incrementCurrentPage()
+            }
         }
         binding.includedLastPageControl.buttonBack.setOnClickListener {
             getFormViewModel.decrementCurrentPage()
         }
         binding.includedLastPageControl.buttonSubmit.setOnClickListener {
-
+            Log.e("tag", "pages ${getFormViewModel.getFormLiveData().value?.data!!.pages}")
         }
     }
 
-    private fun isAllMandatoryQuesitionsAreAnsweredForCurrentPage():Boolean{
-        Log.e("tag", "response ${sectionAdapter.formSectionList}")
+    private fun isAllMandatoryQuestionsAreAnsweredForCurrentPage(formSectionList:List<FormSection>):Boolean{
 
         return true
+    }
+
+    private fun updateCurrentPageFormSectionsWithUserInput(formSectionList:List<FormSection>){
+        val currentPagePosition = arguments?.getInt(getString(R.string.page_position_key))
+        val currentFormPage = getFormViewModel.getFormLiveData().value?.data!!.pages
+        currentFormPage[currentPagePosition!!].section = formSectionList
     }
 
 }
