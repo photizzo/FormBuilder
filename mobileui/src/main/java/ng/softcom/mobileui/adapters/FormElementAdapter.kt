@@ -87,9 +87,13 @@ class FormElementAdapter(
         private val inputText: TextInputEditText = itemView.findViewById(R.id.input_text)
         private val inputLayout: TextInputLayout = itemView.findViewById(R.id.input_layout)
         fun bind(position: Int) = with(itemView) {
-            var userResponse = (items[position] as FormElementText).userResponse
+            val formElementText =  (items[position] as FormElementText)
+
+            val mandatoryAsterisks = if(formElementText.isMandatory) "*" else "" //let user know that field is mandatory
+            inputLayout.hint = "${formElementText.label}  $mandatoryAsterisks"
+
+            var userResponse = formElementText.userResponse
             inputText.setText(userResponse ?: "")
-            inputLayout.hint = (items[position] as FormElementText).label
             inputText.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) {
                 }
@@ -107,7 +111,10 @@ class FormElementAdapter(
         private val sectionNameTv: TextView = itemView.findViewById(R.id.textview_label)
         private val radibGroup:RadioGroup = itemView.findViewById(R.id.radiogroup_yes_or_no)
         fun bind(position: Int) = with(itemView) {
-            sectionNameTv.text = (items[position] as FormElementYesOrNo).label
+            val formElementYesOrNo =  (items[position] as FormElementYesOrNo)
+            val mandatoryAsterisks = if(formElementYesOrNo.isMandatory) "*" else "" //let user know that field is mandatory
+            sectionNameTv.text = "${formElementYesOrNo.label}  $mandatoryAsterisks"
+
             radibGroup.setOnCheckedChangeListener { group, checkedId ->
                 (items[position] as FormElementYesOrNo).userResponseIsYes =
                         checkedId == R.id.radioButton_yes
@@ -121,11 +128,14 @@ class FormElementAdapter(
         private val inputLayout: TextInputLayout = itemView.findViewById(R.id.input_layout)
         private val selectDate: TextView = itemView.findViewById(R.id.textView_select_date)
         fun bind(position: Int) = with(itemView) {
-            inputLayout.hint = (items[position] as FormElementDateAndTime).label
+            val formElementDateAndTime =  (items[position] as FormElementDateAndTime)
+            val mandatoryAsterisks = if(formElementDateAndTime.isMandatory) "*" else "" //let user know that field is mandatory
+            inputLayout.hint = "${formElementDateAndTime.label}  $mandatoryAsterisks"
+
             setOnClickListener {
 
             }
-            var userResponse = (items[position] as FormElementDateAndTime).userResponse
+            var userResponse = formElementDateAndTime.userResponse
             inputText.setText(userResponse ?: "")
             inputText.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) {
@@ -157,8 +167,11 @@ class FormElementAdapter(
         private val inputText: TextInputEditText = itemView.findViewById(R.id.input_text)
         private val inputLayout: TextInputLayout = itemView.findViewById(R.id.input_layout)
         fun bind(position: Int) = with(itemView) {
-            inputLayout.hint = (items[position] as FormElementFormattedNumeric).label
-            var userResponse = (items[position] as FormElementFormattedNumeric).userResponse
+            val formElementNumeric =  (items[position] as FormElementFormattedNumeric)
+            val mandatoryAsterisks = if(formElementNumeric.isMandatory) "*" else "" //let user know that field is mandatory
+            inputLayout.hint = "${formElementNumeric.label}  $mandatoryAsterisks"
+
+            var userResponse = formElementNumeric.userResponse
             inputText.setText(userResponse ?: "")
             inputText.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) {
