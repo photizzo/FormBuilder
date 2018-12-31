@@ -2,17 +2,17 @@ package ng.softcom.models
 
 data class Form(
     val label: String,
-    val pages: List<FormPage>
+    var pages: List<FormPage>
 )
 
 data class FormPage(
     val label: String,
-    val section: List<FormSection>
+    var section: List<FormSection>
 )
 
 data class FormSection(
     val label: String,
-    val elements: List<FormElement>
+    var elements: List<FormElement>
 )
 
 

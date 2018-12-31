@@ -4,7 +4,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.ViewGroup
-import android.widget.RadioButton
+import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputEditText
@@ -16,7 +16,7 @@ import ng.softcom.models.*
 
 class FormElementAdapter(
     var items: List<FormElement>,
-    private val listener: (FormElement) -> Unit
+    private val listener: (List<FormElement>) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 
@@ -89,13 +89,12 @@ class FormElementAdapter(
             inputLayout.hint = (items[position] as FormElementText).label
             inputText.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) {
-
                 }
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
                 }
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                     (items[position] as FormElementText).userResponse = s.toString()
+                    listener(items)
                 }
             })
         }
@@ -103,10 +102,14 @@ class FormElementAdapter(
 
     inner class YesOrNoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val sectionNameTv: TextView = itemView.findViewById(R.id.textview_label)
-        private val yesRadioButton: RadioButton = itemView.findViewById(R.id.radioButton_yes)
+        private val radibGroup:RadioGroup = itemView.findViewById(R.id.radiogroup_yes_or_no)
         fun bind(position: Int) = with(itemView) {
             sectionNameTv.text = (items[position] as FormElementYesOrNo).label
-            (items[position] as FormElementYesOrNo).userResponseIsYes = yesRadioButton.isChecked
+            radibGroup.setOnCheckedChangeListener { group, checkedId ->
+                (items[position] as FormElementYesOrNo).userResponseIsYes =
+                        checkedId == R.id.radioButton_yes
+//                listener(formSectionList)
+            }
         }
     }
 
@@ -128,6 +131,7 @@ class FormElementAdapter(
                 }
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                     (items[position] as FormElementDateAndTime).userResponse = s.toString()
+//                    listener(formSectionList)//update the section formSectionList data
                 }
             })
         }
@@ -147,17 +151,17 @@ class FormElementAdapter(
             inputLayout.hint = (items[position] as FormElementFormattedNumeric).label
             inputText.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) {
-
                 }
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
                 }
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                     (items[position] as FormElementFormattedNumeric).userResponse = s.toString()
+//                    listener(formSectionList)//update the section formSectionList data
                 }
             })
         }
     }
+
 
     companion object {
         private const val YES_OR_NO = 1

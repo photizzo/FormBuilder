@@ -2,6 +2,7 @@ package ng.softcom.mobileui
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +20,7 @@ class FormFragment : Fragment() {
     private lateinit var getFormViewModel: GetFormViewModel
 
     private lateinit var binding: FragmentFormPageBinding
-
+    private lateinit var sectionAdapter:FormSectionAdapter
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
@@ -54,14 +55,14 @@ class FormFragment : Fragment() {
         binding.recyclerViewSection.layoutManager = llm
         val currentPage = arguments?.getInt(getString(R.string.page_position_key))
         val formSections = getFormViewModel.getFormLiveData().value?.data!!.pages[currentPage!!].section
-        val sectionAdapter = FormSectionAdapter(formSections) {
+        sectionAdapter = FormSectionAdapter(formSections) {
             //doing nothing here
         }
         binding.recyclerViewSection.adapter = sectionAdapter
     }
 
     private fun initFormControlButtons() {
-        val currentPage = arguments?.getInt(getString(R.string.page_position_key))
+        val currentPage = arguments!!.getInt(getString(R.string.page_position_key))
         val numberOfPages = getFormViewModel.getFormLiveData().value?.data?.pages?.size!! - 1
 
         when (currentPage) {
@@ -88,13 +89,13 @@ class FormFragment : Fragment() {
         }
 
         binding.includedFirstPageControl.buttonNext.setOnClickListener {
-            if(isAllMandatoryQuesitionsAreAnswered()) getFormViewModel.incrementCurrentPage()
+            if(isAllMandatoryQuesitionsAreAnsweredForCurrentPage()) getFormViewModel.incrementCurrentPage()
         }
         binding.includedMiddlePageControl.buttonBack.setOnClickListener {
             getFormViewModel.decrementCurrentPage()
         }
         binding.includedMiddlePageControl.buttonNext.setOnClickListener {
-            if(isAllMandatoryQuesitionsAreAnswered()) getFormViewModel.incrementCurrentPage()
+            if(isAllMandatoryQuesitionsAreAnsweredForCurrentPage()) getFormViewModel.incrementCurrentPage()
         }
         binding.includedLastPageControl.buttonBack.setOnClickListener {
             getFormViewModel.decrementCurrentPage()
@@ -104,7 +105,8 @@ class FormFragment : Fragment() {
         }
     }
 
-    private fun isAllMandatoryQuesitionsAreAnswered():Boolean{
+    private fun isAllMandatoryQuesitionsAreAnsweredForCurrentPage():Boolean{
+        Log.e("tag", "response ${sectionAdapter.formSectionList}")
 
         return true
     }
