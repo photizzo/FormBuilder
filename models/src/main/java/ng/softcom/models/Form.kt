@@ -1,5 +1,7 @@
 package ng.softcom.models
 
+import com.google.gson.annotations.SerializedName
+
 data class Form(
     val label: String,
     var pages: List<FormPage>
@@ -20,12 +22,12 @@ enum class FormElementType {
     YES_OR_NO, TEXT, EMBEDDED_PHOTO, FORMATTED_NUMERIC, DATE_TIME
 }
 
-open class FormElement(val formType: FormElementType)
+open class FormElement(var formType: FormElementType)
 
 data class FormElementText(
     val label: String,
     val isMandatory: Boolean,
-    val uniqueId: String,
+    @SerializedName("unique_id") val uniqueId: String,
     val rules: List<Rules?>,
     var userResponse: String?
 ) : FormElement(FormElementType.TEXT)
@@ -33,23 +35,23 @@ data class FormElementText(
 data class FormElementYesOrNo(
     val label: String,
     val isMandatory: Boolean,
-    val uniqueId: String,
+    @SerializedName("unique_id") val uniqueId: String,
     val rules: List<Rules?>,
     var userResponseIsYes: Boolean?
 ) : FormElement(FormElementType.YES_OR_NO)
 
 data class FormElementEmbeddedPhoto(
     val file: String,
-    val uniqueId: String,
+    @SerializedName("unique_id") val uniqueId: String,
     val rules: List<Rules?>
 ) : FormElement(FormElementType.EMBEDDED_PHOTO)
 
 data class FormElementFormattedNumeric(
     val label: String,
     val keyboard: String,
-    val formatPattern: String,
+    @SerializedName("formattedNumeric")val formatPattern: String,
     val isMandatory: Boolean,
-    val uniqueId: String,
+    @SerializedName("unique_id")val uniqueId: String,
     val rules: List<Rules?>,
     var userResponse: String?
 ) : FormElement(FormElementType.FORMATTED_NUMERIC)
@@ -58,7 +60,7 @@ data class FormElementDateAndTime(
     val label: String,
     val mode: String,
     val isMandatory: Boolean,
-    val uniqueId: String,
+    @SerializedName("unique_id") val uniqueId: String,
     val rules: List<Rules?>,
     var userResponse: String?
 ) : FormElement(FormElementType.DATE_TIME)

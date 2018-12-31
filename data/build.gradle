@@ -8,6 +8,8 @@ dependencies {
     implementation DataDependencies.kotlin
     implementation DataDependencies.javaxInject
     implementation DataDependencies.rxKotlin
+    implementation RemoteDependencies.gson
+
 
     testImplementation DataTestDependencies.junit
     testImplementation DataTestDependencies.kotlinJUnit
