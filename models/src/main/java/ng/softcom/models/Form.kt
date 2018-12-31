@@ -29,7 +29,8 @@ data class FormElementText(
     val isMandatory: Boolean,
     @SerializedName("unique_id") val uniqueId: String,
     val rules: List<Rules?>,
-    var userResponse: String?
+    var userResponse: String?,
+    var isVisible:Boolean = true
 ) : FormElement(FormElementType.TEXT)
 
 data class FormElementYesOrNo(
@@ -37,7 +38,8 @@ data class FormElementYesOrNo(
     val isMandatory: Boolean,
     @SerializedName("unique_id") val uniqueId: String,
     val rules: List<Rules?>,
-    var userResponseIsYes: Boolean?
+    var userResponseIsYes: Boolean?,
+    var isVisible:Boolean = true
 ) : FormElement(FormElementType.YES_OR_NO)
 
 data class FormElementEmbeddedPhoto(
@@ -53,7 +55,8 @@ data class FormElementFormattedNumeric(
     val isMandatory: Boolean,
     @SerializedName("unique_id")val uniqueId: String,
     val rules: List<Rules?>,
-    var userResponse: String?
+    var userResponse: String?,
+    var isVisible:Boolean = true
 ) : FormElement(FormElementType.FORMATTED_NUMERIC)
 
 data class FormElementDateAndTime(
@@ -62,7 +65,8 @@ data class FormElementDateAndTime(
     val isMandatory: Boolean,
     @SerializedName("unique_id") val uniqueId: String,
     val rules: List<Rules?>,
-    var userResponse: String?
+    var userResponse: String?,
+    var isVisible:Boolean = true
 ) : FormElement(FormElementType.DATE_TIME)
 
 data class Rules(

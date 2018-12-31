@@ -1,7 +1,9 @@
 package ng.softcom.mobileui.adapters
 
+import android.app.DatePickerDialog
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioGroup
@@ -14,6 +16,8 @@ import ng.softcom.mobileui.R
 import ng.softcom.mobileui.injection.GlideApp
 import ng.softcom.mobileui.utils.inflate
 import ng.softcom.models.*
+import java.util.*
+
 
 class FormElementAdapter(
     var items: List<FormElement>,
@@ -88,7 +92,8 @@ class FormElementAdapter(
         private val inputLayout: TextInputLayout = itemView.findViewById(R.id.input_layout)
         fun bind(position: Int) = with(itemView) {
             val formElementText =  (items[position] as FormElementText)
-
+            if(!formElementText.isVisible) this.visibility = View.VISIBLE
+            else this.visibility = View.GONE
             val mandatoryAsterisks = if(formElementText.isMandatory) "*" else "" //let user know that field is mandatory
             inputLayout.hint = "${formElementText.label}  $mandatoryAsterisks"
 
@@ -112,12 +117,22 @@ class FormElementAdapter(
         private val radibGroup:RadioGroup = itemView.findViewById(R.id.radiogroup_yes_or_no)
         fun bind(position: Int) = with(itemView) {
             val formElementYesOrNo =  (items[position] as FormElementYesOrNo)
+            if(!formElementYesOrNo.isVisible) this.visibility = View.VISIBLE
+            else this.visibility = View.GONE
             val mandatoryAsterisks = if(formElementYesOrNo.isMandatory) "*" else "" //let user know that field is mandatory
             sectionNameTv.text = "${formElementYesOrNo.label}  $mandatoryAsterisks"
+
 
             radibGroup.setOnCheckedChangeListener { group, checkedId ->
                 (items[position] as FormElementYesOrNo).userResponseIsYes =
                         checkedId == R.id.radioButton_yes
+
+                if (formElementYesOrNo.rules.isNotEmpty()){
+                    if(checkedId == R.id.radioButton_yes)
+                        pageRuleChanged(formElementYesOrNo.rules, false)
+                    else pageRuleChanged(formElementYesOrNo.rules, true)
+                }
+
                 listener(items)
             }
         }
@@ -129,11 +144,19 @@ class FormElementAdapter(
         private val selectDate: TextView = itemView.findViewById(R.id.textView_select_date)
         fun bind(position: Int) = with(itemView) {
             val formElementDateAndTime =  (items[position] as FormElementDateAndTime)
+            if(!formElementDateAndTime.isVisible) this.visibility = View.VISIBLE
+            else this.visibility = View.GONE
             val mandatoryAsterisks = if(formElementDateAndTime.isMandatory) "*" else "" //let user know that field is mandatory
             inputLayout.hint = "${formElementDateAndTime.label}  $mandatoryAsterisks"
 
             setOnClickListener {
-
+                val calender = Calendar.getInstance()
+                val datePickerDialog = DatePickerDialog(context,
+                    DatePickerDialog.OnDateSetListener {
+                            view, year, month, dayOfMonth -> inputText.setText("$year-$month-$dayOfMonth")
+                    },
+                    calender.get(Calendar.YEAR), calender.get(Calendar.MONTH), calender.get(Calendar.DAY_OF_MONTH))
+                datePickerDialog.show()
             }
             var userResponse = formElementDateAndTime.userResponse
             inputText.setText(userResponse ?: "")
@@ -168,6 +191,8 @@ class FormElementAdapter(
         private val inputLayout: TextInputLayout = itemView.findViewById(R.id.input_layout)
         fun bind(position: Int) = with(itemView) {
             val formElementNumeric =  (items[position] as FormElementFormattedNumeric)
+            if(!formElementNumeric.isVisible) this.visibility = View.VISIBLE
+            else this.visibility = View.GONE
             val mandatoryAsterisks = if(formElementNumeric.isMandatory) "*" else "" //let user know that field is mandatory
             inputLayout.hint = "${formElementNumeric.label}  $mandatoryAsterisks"
 
@@ -184,6 +209,46 @@ class FormElementAdapter(
                 }
             })
         }
+    }
+
+    fun pageRuleChanged(rules: List<Rules?>, hideAction:Boolean){
+        for(i in rules){
+            val targetsList = i!!.targets
+            Log.e("tag", "targets $targetsList")
+            items.map {
+                when (it.formType) {
+                    FormElementType.YES_OR_NO -> {
+                        val formElement = it as FormElementYesOrNo
+                        if(targetsList.contains(formElement.uniqueId)){
+                            formElement.isVisible = hideAction
+                        }
+                    }
+                    FormElementType.EMBEDDED_PHOTO -> {
+                        //do nothing
+                    }
+                    FormElementType.FORMATTED_NUMERIC -> {
+                        val formElement = it as FormElementFormattedNumeric
+                        if(targetsList.contains(formElement.uniqueId)){
+                            formElement.isVisible = hideAction
+                        }
+                    }
+                    FormElementType.DATE_TIME -> {
+                        val formElement = it as FormElementDateAndTime
+                        if(targetsList.contains(formElement.uniqueId)){
+                            formElement.isVisible = hideAction
+                        }
+                    }
+                    else -> {
+                        val formElement = it as FormElementText
+                        if(targetsList.contains(formElement.uniqueId)){
+                            formElement.isVisible = hideAction
+                        }
+                    }
+                }
+
+            }
+        }
+        notifyDataSetChanged()
     }
 
     companion object {

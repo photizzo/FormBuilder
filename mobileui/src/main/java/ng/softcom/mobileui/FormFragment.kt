@@ -23,7 +23,7 @@ class FormFragment : Fragment() {
     private lateinit var getFormViewModel: GetFormViewModel
 
     private lateinit var binding: FragmentFormPageBinding
-    private lateinit var sectionAdapter:FormSectionAdapter
+    private lateinit var sectionAdapter: FormSectionAdapter
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
@@ -76,8 +76,9 @@ class FormFragment : Fragment() {
                 binding.includedMiddlePageControl.parent.visibility = View.GONE
                 //check if form is a single page form only show submit button
                 if (getFormViewModel.getCurrentPageLiveData().value == 1
-                    && getFormViewModel.getFormLiveData().value?.data?.pages?.size == 1)
-                        binding.includedLastPageControl.buttonBack.visibility = View.GONE
+                    && getFormViewModel.getFormLiveData().value?.data?.pages?.size == 1
+                )
+                    binding.includedLastPageControl.buttonBack.visibility = View.GONE
             }
             //first page
             0 -> {
@@ -92,7 +93,7 @@ class FormFragment : Fragment() {
         }
 
         binding.includedFirstPageControl.buttonNext.setOnClickListener {
-            if(isAllMandatoryQuestionsAreAnsweredForCurrentPage()) {
+            if (isAllMandatoryQuestionsAreAnsweredForCurrentPage()) {
                 updateCurrentPageFormSectionsWithUserInput()
                 getFormViewModel.incrementCurrentPage()
             } else activity?.showSnackbar("All mandatory field marked * must be filled", Snackbar.LENGTH_LONG)
@@ -101,7 +102,7 @@ class FormFragment : Fragment() {
             getFormViewModel.decrementCurrentPage()
         }
         binding.includedMiddlePageControl.buttonNext.setOnClickListener {
-            if(isAllMandatoryQuestionsAreAnsweredForCurrentPage()){
+            if (isAllMandatoryQuestionsAreAnsweredForCurrentPage()) {
                 updateCurrentPageFormSectionsWithUserInput()
                 getFormViewModel.incrementCurrentPage()
             } else activity?.showSnackbar("All mandatory field marked * must be filled", Snackbar.LENGTH_LONG)
@@ -110,7 +111,7 @@ class FormFragment : Fragment() {
             getFormViewModel.decrementCurrentPage()
         }
         binding.includedLastPageControl.buttonSubmit.setOnClickListener {
-            if(isAllMandatoryQuestionsAreAnsweredForCurrentPage()){
+            if (isAllMandatoryQuestionsAreAnsweredForCurrentPage()) {
                 Log.e("tag", "pages ${getFormViewModel.getFormLiveData().value?.data!!.pages}")
 
             } else activity?.showSnackbar("All mandatory field marked * must be filled", Snackbar.LENGTH_LONG)
@@ -118,49 +119,49 @@ class FormFragment : Fragment() {
         }
     }
 
-    private fun isAllMandatoryQuestionsAreAnsweredForCurrentPage():Boolean{
+    private fun isAllMandatoryQuestionsAreAnsweredForCurrentPage(): Boolean {
         var allMandatoryQuestionsAnswered = false
-        for(i in sectionAdapter.formSectionList){
-            for(j in i.elements){
-                when(j.formType){
+        for (i in sectionAdapter.formSectionList) {
+            for (j in i.elements) {
+                when (j.formType) {
                     FormElementType.YES_OR_NO -> {
                         val formElement = j as FormElementYesOrNo
-                        allMandatoryQuestionsAnswered = if(formElement.isMandatory){
-                            formElement.userResponseIsYes != null
-                        } else {
-                            true
-                        }
-                        Log.e("tag", "yes/no $allMandatoryQuestionsAnswered")
+                        allMandatoryQuestionsAnswered =
+                                if (formElement.isMandatory) {
+                                    formElement.userResponseIsYes != null
+                                } else {
+                                    true
+                                }
                     }
                     FormElementType.EMBEDDED_PHOTO -> {
                         //do nothing
                     }
                     FormElementType.FORMATTED_NUMERIC -> {
                         val formElement = j as FormElementFormattedNumeric
-                        allMandatoryQuestionsAnswered = if(formElement.isMandatory){
-                            formElement.userResponse != null && formElement.userResponse!!.isNotEmpty()
-                        } else {
-                            true
-                        }
-                        Log.e("tag", "numeric $allMandatoryQuestionsAnswered")
+                        allMandatoryQuestionsAnswered =
+                                if (formElement.isMandatory) {
+                                    formElement.userResponse != null && formElement.userResponse!!.isNotEmpty()
+                                } else {
+                                    true
+                                }
                     }
                     FormElementType.DATE_TIME -> {
                         val formElement = j as FormElementDateAndTime
-                        allMandatoryQuestionsAnswered = if(formElement.isMandatory){
-                            formElement.userResponse != null && formElement.userResponse!!.isNotEmpty()
-                        } else {
-                            true
-                        }
-                        Log.e("tag", "datetime $allMandatoryQuestionsAnswered")
+                        allMandatoryQuestionsAnswered =
+                                if (formElement.isMandatory) {
+                                    formElement.userResponse != null && formElement.userResponse!!.isNotEmpty()
+                                } else {
+                                    true
+                                }
                     }
                     else -> {
                         val formElement = j as FormElementText
-                        allMandatoryQuestionsAnswered = if(formElement.isMandatory){
-                            formElement.userResponse != null && formElement.userResponse!!.isNotEmpty()
-                        } else {
-                            true
-                        }
-                        Log.e("tag", "text $allMandatoryQuestionsAnswered")
+                        allMandatoryQuestionsAnswered =
+                                if (formElement.isMandatory) {
+                                    formElement.userResponse != null && formElement.userResponse!!.isNotEmpty()
+                                } else {
+                                    true
+                                }
                     }
                 }
             }
@@ -168,9 +169,10 @@ class FormFragment : Fragment() {
         return allMandatoryQuestionsAnswered
     }
 
-    private fun updateCurrentPageFormSectionsWithUserInput(){
+    private fun updateCurrentPageFormSectionsWithUserInput() {
         val currentPagePosition = arguments?.getInt(getString(R.string.page_position_key))
-        getFormViewModel.getFormLiveData().value?.data!!.pages[currentPagePosition!!].section = sectionAdapter.formSectionList
+        getFormViewModel.getFormLiveData().value?.data!!.pages[currentPagePosition!!].section =
+                sectionAdapter.formSectionList
     }
 
 }

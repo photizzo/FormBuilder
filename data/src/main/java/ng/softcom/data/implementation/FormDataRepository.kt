@@ -186,19 +186,86 @@ class FormDataRepository @Inject constructor() : FormRepository {
         }
         val form = Form(label, formPageList)
 
+        for (i in form.pages) {
+            for (j in i.section) {
+                for (k in j.elements) {
+                    when (k.formType) {
+                        FormElementType.YES_OR_NO -> {
+                            val formElement = k as FormElementYesOrNo
+                            if (formElement.rules.isNotEmpty()) {
+                                pageRuleChanged(formElement.rules, j.elements)
+                            }
+                        }
+                        FormElementType.EMBEDDED_PHOTO -> {
+                            //do nothing
+                        }
+                        FormElementType.FORMATTED_NUMERIC -> {
+                            val formElement = k as FormElementFormattedNumeric
+                            if (formElement.rules.isNotEmpty()) {
+                                pageRuleChanged(formElement.rules, j.elements)
+                            }
+                        }
+                        FormElementType.DATE_TIME -> {
+                            val formElement = k as FormElementDateAndTime
+                            if (formElement.rules.isNotEmpty()) {
+                                pageRuleChanged(formElement.rules, j.elements)
+                            }
+                        }
+                        else -> {
+                            val formElement = k as FormElementText
+                            if (formElement.rules.isNotEmpty()) {
+                                pageRuleChanged(formElement.rules, j.elements)
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+
+        println("form $form")
         return Observable.just(form)
     }
 
-    private fun readJsonDataFromFile(fileName: String):String {
-        var c:Int? = null
+    private fun pageRuleChanged(rules: List<Rules?>, items: List<FormElement>) {
+        for (i in rules) {
+            val targetsList = i!!.targets
+            items.map {
+                when (it.formType) {
+                    FormElementType.YES_OR_NO -> {
+                        val formElement = it as FormElementYesOrNo
+                        formElement.isVisible = targetsList.contains(formElement.uniqueId)
+                    }
+                    FormElementType.EMBEDDED_PHOTO -> {
+                        //do nothing
+                    }
+                    FormElementType.FORMATTED_NUMERIC -> {
+                        val formElement = it as FormElementFormattedNumeric
+                        formElement.isVisible = targetsList.contains(formElement.uniqueId)
+                    }
+                    FormElementType.DATE_TIME -> {
+                        val formElement = it as FormElementDateAndTime
+                        formElement.isVisible = targetsList.contains(formElement.uniqueId)
+                    }
+                    else -> {
+                        val formElement = it as FormElementText
+                        formElement.isVisible = targetsList.contains(formElement.uniqueId)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun readJsonDataFromFile(fileName: String): String {
+        var c: Int? = null
         try {
             val fin = FileReader(fileName)
             do {
                 c = fin.read()
                 print(c.toChar())
 
-            }while (c!=-1)
-        } catch (ex:Exception){
+            } while (c != -1)
+        } catch (ex: Exception) {
             print("error file reading ${ex.localizedMessage}")
         }
         return c.toString()
