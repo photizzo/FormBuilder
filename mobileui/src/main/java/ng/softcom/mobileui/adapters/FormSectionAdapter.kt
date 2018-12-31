@@ -45,6 +45,7 @@ class FormSectionAdapter(
                     this[position].elements = it
                 }
             }
+
             recyclerView.adapter = elementAdapter
         }
     }

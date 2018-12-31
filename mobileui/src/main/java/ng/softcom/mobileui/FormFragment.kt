@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.android.support.AndroidSupportInjection
 import ng.softcom.mobileui.adapters.FormSectionAdapter
 import ng.softcom.mobileui.databinding.FragmentFormPageBinding
-import ng.softcom.models.FormSection
 import ng.softcom.presentation.viewmodel.GetFormViewModel
 
 class FormFragment : Fragment() {
@@ -90,8 +89,8 @@ class FormFragment : Fragment() {
         }
 
         binding.includedFirstPageControl.buttonNext.setOnClickListener {
-            if(isAllMandatoryQuestionsAreAnsweredForCurrentPage(sectionAdapter.formSectionList)) {
-                updateCurrentPageFormSectionsWithUserInput(sectionAdapter.formSectionList)
+            if(isAllMandatoryQuestionsAreAnsweredForCurrentPage()) {
+                updateCurrentPageFormSectionsWithUserInput()
                 getFormViewModel.incrementCurrentPage()
             }
         }
@@ -99,8 +98,8 @@ class FormFragment : Fragment() {
             getFormViewModel.decrementCurrentPage()
         }
         binding.includedMiddlePageControl.buttonNext.setOnClickListener {
-            if(isAllMandatoryQuestionsAreAnsweredForCurrentPage(sectionAdapter.formSectionList)){
-                updateCurrentPageFormSectionsWithUserInput(sectionAdapter.formSectionList)
+            if(isAllMandatoryQuestionsAreAnsweredForCurrentPage()){
+                updateCurrentPageFormSectionsWithUserInput()
                 getFormViewModel.incrementCurrentPage()
             }
         }
@@ -112,15 +111,14 @@ class FormFragment : Fragment() {
         }
     }
 
-    private fun isAllMandatoryQuestionsAreAnsweredForCurrentPage(formSectionList:List<FormSection>):Boolean{
+    private fun isAllMandatoryQuestionsAreAnsweredForCurrentPage():Boolean{
 
         return true
     }
 
-    private fun updateCurrentPageFormSectionsWithUserInput(formSectionList:List<FormSection>){
+    private fun updateCurrentPageFormSectionsWithUserInput(){
         val currentPagePosition = arguments?.getInt(getString(R.string.page_position_key))
-        val currentFormPage = getFormViewModel.getFormLiveData().value?.data!!.pages
-        currentFormPage[currentPagePosition!!].section = formSectionList
+        getFormViewModel.getFormLiveData().value?.data!!.pages[currentPagePosition!!].section = sectionAdapter.formSectionList
     }
 
 }

@@ -86,6 +86,8 @@ class FormElementAdapter(
         private val inputText: TextInputEditText = itemView.findViewById(R.id.input_text)
         private val inputLayout: TextInputLayout = itemView.findViewById(R.id.input_layout)
         fun bind(position: Int) = with(itemView) {
+            var userResponse = (items[position] as FormElementText).userResponse
+            inputText.setText(userResponse ?: "")
             inputLayout.hint = (items[position] as FormElementText).label
             inputText.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) {
@@ -122,6 +124,8 @@ class FormElementAdapter(
             setOnClickListener {
 
             }
+            var userResponse = (items[position] as FormElementDateAndTime).userResponse
+            inputText.setText(userResponse ?: "")
             inputText.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) {
 
@@ -149,6 +153,8 @@ class FormElementAdapter(
         private val inputLayout: TextInputLayout = itemView.findViewById(R.id.input_layout)
         fun bind(position: Int) = with(itemView) {
             inputLayout.hint = (items[position] as FormElementFormattedNumeric).label
+            var userResponse = (items[position] as FormElementFormattedNumeric).userResponse
+            inputText.setText(userResponse ?: "")
             inputText.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) {
                 }
