@@ -1,5 +1,7 @@
 package ng.softcom.mobileui
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -105,5 +107,11 @@ class FormActivity : DaggerAppCompatActivity() {
 
         //move to the next page
         binding.pager.currentItem = pageNumber
+    }
+
+    companion object {
+        fun startActivity(context: Context){
+            context.startActivity(Intent(context, SuccessActivity::class.java))
+        }
     }
 }

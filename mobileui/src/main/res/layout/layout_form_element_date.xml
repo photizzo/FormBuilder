@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/nunito_bold"
             android:hint="Hint *"
-            android:inputType="text"
+            android:inputType="none"
             android:enabled="false"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             android:textColor="@color/textNormal"

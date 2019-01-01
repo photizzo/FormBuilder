@@ -125,7 +125,6 @@ class FormElementAdapter(
 
             radibGroup.setOnCheckedChangeListener { group, checkedId ->
                 formElementYesOrNo.userResponse = FormResponse(booleanResponse = checkedId == R.id.radioButton_yes)
-
                 if (formElementYesOrNo.rules.isNotEmpty()){
                     if(checkedId == R.id.radioButton_yes)
                         applyRulesToFormElement(formElementYesOrNo.rules, false)
@@ -140,7 +139,6 @@ class FormElementAdapter(
     inner class DateAndTimeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val inputText: TextInputEditText = itemView.findViewById(R.id.input_text)
         private val inputLayout: TextInputLayout = itemView.findViewById(R.id.input_layout)
-        private val selectDate: TextView = itemView.findViewById(R.id.textView_select_date)
         fun bind(position: Int) = with(itemView) {
             val formElementDateAndTime =  items[position]
             if(!formElementDateAndTime.isVisible) this.visibility = View.VISIBLE
