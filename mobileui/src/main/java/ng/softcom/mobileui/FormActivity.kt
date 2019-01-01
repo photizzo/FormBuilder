@@ -111,7 +111,7 @@ class FormActivity : DaggerAppCompatActivity() {
 
     companion object {
         fun startActivity(context: Context){
-            context.startActivity(Intent(context, SuccessActivity::class.java))
+            context.startActivity(Intent(context, FormActivity::class.java))
         }
     }
 }
