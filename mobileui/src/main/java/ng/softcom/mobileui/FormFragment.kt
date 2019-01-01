@@ -2,6 +2,7 @@ package ng.softcom.mobileui
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -121,19 +122,22 @@ class FormFragment : Fragment() {
     }
 
     private fun isAllMandatoryQuestionsAreAnsweredForCurrentPage(): Boolean {
+        val allMandatoryQuestionsAnsweredList = mutableListOf<Boolean>()
         var allMandatoryQuestionsAnswered = false
         for (i in sectionAdapter.formSectionList) {
             for (formElement in i.elements) {
-                if(formElement.formType == FormElementType.EMBEDDED_PHOTO) break
+                if (formElement.formType == FormElementType.EMBEDDED_PHOTO) break
                 allMandatoryQuestionsAnswered =
                         if (formElement.isMandatory!!) {
-                            if(formElement.formType == FormElementType.YES_OR_NO ) formElement.userResponse?.booleanResponse != null
+                            if (formElement.formType == FormElementType.YES_OR_NO) formElement.userResponse?.booleanResponse != null
                             else formElement.userResponse?.stringResponse != null && formElement.userResponse?.stringResponse!!.isNotEmpty()
-
-                        } else allMandatoryQuestionsAnswered
+                        } else true
+                            allMandatoryQuestionsAnsweredList.add(allMandatoryQuestionsAnswered)
+//                Log.e("tag", "form type ${formElement.formType} allMandatory $allMandatoryQuestionsAnswered")
             }
         }
-        return allMandatoryQuestionsAnswered
+        Log.e("tag", "mandatory list $allMandatoryQuestionsAnsweredList")
+        return !allMandatoryQuestionsAnsweredList.contains(false)
     }
 
     private fun updateCurrentPageFormSectionsWithUserInput() {
