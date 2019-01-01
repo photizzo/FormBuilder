@@ -2,7 +2,6 @@ package ng.softcom.mobileui
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -113,8 +112,8 @@ class FormFragment : Fragment() {
         binding.includedLastPageControl.buttonSubmit.setOnClickListener {
             if (isAllMandatoryQuestionsAreAnsweredForCurrentPage()) {
                 //todo: add submit in domain repository
-                activity?.finish()
                 SuccessActivity.startActivity(activity as Context)
+                activity?.finish()
 
             } else activity?.showSnackbar("All mandatory field marked * must be filled", Snackbar.LENGTH_LONG)
 
@@ -136,7 +135,6 @@ class FormFragment : Fragment() {
 //                Log.e("tag", "form type ${formElement.formType} allMandatory $allMandatoryQuestionsAnswered")
             }
         }
-        Log.e("tag", "mandatory list $allMandatoryQuestionsAnsweredList")
         return !allMandatoryQuestionsAnsweredList.contains(false)
     }
 

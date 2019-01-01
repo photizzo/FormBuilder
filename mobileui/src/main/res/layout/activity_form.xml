@@ -36,7 +36,7 @@
                     android:layout_marginStart="32dp"
                     android:layout_marginEnd="8dp"
                     android:fontFamily="@font/nunito_extrabold"
-                    android:text="Form Title"
+                    android:text="Soft Forms"
                     android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                     android:textColor="@android:color/white"
                     android:textSize="18sp"

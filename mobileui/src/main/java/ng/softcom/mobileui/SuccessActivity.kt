@@ -13,8 +13,8 @@ class SuccessActivity : AppCompatActivity() {
         setContentView(R.layout.activity_success)
 
         button_take_another_survey.setOnClickListener {
-            finish()
             FormActivity.startActivity(this)
+            finish()
         }
     }
 
