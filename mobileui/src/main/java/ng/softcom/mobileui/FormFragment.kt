@@ -15,7 +15,7 @@ import dagger.android.support.AndroidSupportInjection
 import ng.softcom.mobileui.adapters.FormSectionAdapter
 import ng.softcom.mobileui.databinding.FragmentFormPageBinding
 import ng.softcom.mobileui.utils.showSnackbar
-import ng.softcom.models.*
+import ng.softcom.models.FormElementType
 import ng.softcom.presentation.viewmodel.GetFormViewModel
 
 class FormFragment : Fragment() {
@@ -122,40 +122,14 @@ class FormFragment : Fragment() {
     private fun isAllMandatoryQuestionsAreAnsweredForCurrentPage(): Boolean {
         var allMandatoryQuestionsAnswered = false
         for (i in sectionAdapter.formSectionList) {
-            for (j in i.elements) {
-                when (j.formType) {
-                    FormElementType.YES_OR_NO -> {
-                        val formElement = j as FormElementYesOrNo
-                        allMandatoryQuestionsAnswered =
-                                if (formElement.isMandatory) {
-                                    formElement.userResponseIsYes != null
-                                } else allMandatoryQuestionsAnswered
-                    }
-                    FormElementType.EMBEDDED_PHOTO -> {
-                        //do nothing
-                    }
-                    FormElementType.FORMATTED_NUMERIC -> {
-                        val formElement = j as FormElementFormattedNumeric
-                        allMandatoryQuestionsAnswered =
-                                if (formElement.isMandatory) {
-                                    formElement.userResponse != null && formElement.userResponse!!.isNotEmpty()
-                                } else allMandatoryQuestionsAnswered
-                    }
-                    FormElementType.DATE_TIME -> {
-                        val formElement = j as FormElementDateAndTime
-                        allMandatoryQuestionsAnswered =
-                                if (formElement.isMandatory) {
-                                    formElement.userResponse != null && formElement.userResponse!!.isNotEmpty()
-                                } else allMandatoryQuestionsAnswered
-                    }
-                    else -> {
-                        val formElement = j as FormElementText
-                        allMandatoryQuestionsAnswered =
-                                if (formElement.isMandatory) {
-                                    formElement.userResponse != null && formElement.userResponse!!.isNotEmpty()
-                                } else allMandatoryQuestionsAnswered
-                    }
-                }
+            for (formElement in i.elements) {
+                if(formElement.formType == FormElementType.EMBEDDED_PHOTO) break
+                allMandatoryQuestionsAnswered =
+                        if (formElement.isMandatory!!) {
+                            if(formElement.formType == FormElementType.YES_OR_NO ) formElement.userResponse?.booleanResponse != null
+                            else formElement.userResponse?.stringResponse != null && formElement.userResponse?.stringResponse!!.isNotEmpty()
+
+                        } else allMandatoryQuestionsAnswered
             }
         }
         return allMandatoryQuestionsAnswered

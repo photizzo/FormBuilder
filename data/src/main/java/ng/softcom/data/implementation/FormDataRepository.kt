@@ -11,6 +11,7 @@ import javax.inject.Inject
 class FormDataRepository @Inject constructor() : FormRepository {
 
     override fun getForm(): Observable<Form> {
+
         val jsonString = "{\n" +
                 "  \"id\": \"form_1\",\n" +
                 "  \"name\": \"Pet Adoption Application Form\",\n" +
@@ -185,73 +186,28 @@ class FormDataRepository @Inject constructor() : FormRepository {
             formPageList.add(FormPage(label, formSectionList))
         }
         val form = Form(label, formPageList)
+        applyRulesToForm(form)
 
-        for (i in form.pages) {
-            for (j in i.section) {
-                for (k in j.elements) {
-                    when (k.formType) {
-                        FormElementType.YES_OR_NO -> {
-                            val formElement = k as FormElementYesOrNo
-                            if (formElement.rules.isNotEmpty()) {
-                                pageRuleChanged(formElement.rules, j.elements)
-                            }
-                        }
-                        FormElementType.EMBEDDED_PHOTO -> {
-                            //do nothing
-                        }
-                        FormElementType.FORMATTED_NUMERIC -> {
-                            val formElement = k as FormElementFormattedNumeric
-                            if (formElement.rules.isNotEmpty()) {
-                                pageRuleChanged(formElement.rules, j.elements)
-                            }
-                        }
-                        FormElementType.DATE_TIME -> {
-                            val formElement = k as FormElementDateAndTime
-                            if (formElement.rules.isNotEmpty()) {
-                                pageRuleChanged(formElement.rules, j.elements)
-                            }
-                        }
-                        else -> {
-                            val formElement = k as FormElementText
-                            if (formElement.rules.isNotEmpty()) {
-                                pageRuleChanged(formElement.rules, j.elements)
-                            }
-                        }
-                    }
-
-                }
-            }
-        }
-
-        println("form $form")
+        println("myform $form")
         return Observable.just(form)
     }
 
-    private fun pageRuleChanged(rules: List<Rules?>, items: List<FormElement>) {
+    private fun applyRulesToForm(form: Form){
+        for (i in form.pages) {
+            for (j in i.section) {
+                for (k in j.elements) {
+                    if(k.rules.isNotEmpty()){
+                        applyRulesToFormElement(k.rules, j.elements)
+                    }
+                }
+            }
+        }
+    }
+    private fun applyRulesToFormElement(rules: List<Rules?>, items: List<FormElement>) {
         for (i in rules) {
             val targetsList = i!!.targets
             items.map {
-                when (it.formType) {
-                    FormElementType.YES_OR_NO -> {
-                        val formElement = it as FormElementYesOrNo
-                        formElement.isVisible = targetsList.contains(formElement.uniqueId)
-                    }
-                    FormElementType.EMBEDDED_PHOTO -> {
-                        //do nothing
-                    }
-                    FormElementType.FORMATTED_NUMERIC -> {
-                        val formElement = it as FormElementFormattedNumeric
-                        formElement.isVisible = targetsList.contains(formElement.uniqueId)
-                    }
-                    FormElementType.DATE_TIME -> {
-                        val formElement = it as FormElementDateAndTime
-                        formElement.isVisible = targetsList.contains(formElement.uniqueId)
-                    }
-                    else -> {
-                        val formElement = it as FormElementText
-                        formElement.isVisible = targetsList.contains(formElement.uniqueId)
-                    }
-                }
+                it.isVisible = targetsList.contains(it.uniqueId)
             }
         }
     }

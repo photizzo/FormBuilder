@@ -91,21 +91,21 @@ class FormElementAdapter(
         private val inputText: TextInputEditText = itemView.findViewById(R.id.input_text)
         private val inputLayout: TextInputLayout = itemView.findViewById(R.id.input_layout)
         fun bind(position: Int) = with(itemView) {
-            val formElementText =  (items[position] as FormElementText)
+            val formElementText =  items[position]
             if(!formElementText.isVisible) this.visibility = View.VISIBLE
             else this.visibility = View.GONE
-            val mandatoryAsterisks = if(formElementText.isMandatory) "*" else "" //let user know that field is mandatory
+            val mandatoryAsterisks = if(formElementText.isMandatory!!) "*" else "" //let user know that field is mandatory
             inputLayout.hint = "${formElementText.label}  $mandatoryAsterisks"
 
             var userResponse = formElementText.userResponse
-            inputText.setText(userResponse ?: "")
+            inputText.setText(userResponse?.stringResponse ?: "")
             inputText.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) {
                 }
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
                 }
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    (items[position] as FormElementText).userResponse = s.toString()
+                    formElementText.userResponse = FormResponse(stringResponse = s.toString())
                     listener(items)
                 }
             })
@@ -116,21 +116,20 @@ class FormElementAdapter(
         private val sectionNameTv: TextView = itemView.findViewById(R.id.textview_label)
         private val radibGroup:RadioGroup = itemView.findViewById(R.id.radiogroup_yes_or_no)
         fun bind(position: Int) = with(itemView) {
-            val formElementYesOrNo =  (items[position] as FormElementYesOrNo)
+            val formElementYesOrNo =  items[position]
             if(!formElementYesOrNo.isVisible) this.visibility = View.VISIBLE
             else this.visibility = View.GONE
-            val mandatoryAsterisks = if(formElementYesOrNo.isMandatory) "*" else "" //let user know that field is mandatory
+            val mandatoryAsterisks = if(formElementYesOrNo.isMandatory!!) "*" else "" //let user know that field is mandatory
             sectionNameTv.text = "${formElementYesOrNo.label}  $mandatoryAsterisks"
 
 
             radibGroup.setOnCheckedChangeListener { group, checkedId ->
-                (items[position] as FormElementYesOrNo).userResponseIsYes =
-                        checkedId == R.id.radioButton_yes
+                formElementYesOrNo.userResponse = FormResponse(booleanResponse = checkedId == R.id.radioButton_yes)
 
                 if (formElementYesOrNo.rules.isNotEmpty()){
                     if(checkedId == R.id.radioButton_yes)
-                        pageRuleChanged(formElementYesOrNo.rules, false)
-                    else pageRuleChanged(formElementYesOrNo.rules, true)
+                        applyRulesToFormElement(formElementYesOrNo.rules, false)
+                    else applyRulesToFormElement(formElementYesOrNo.rules, true)
                 }
 
                 listener(items)
@@ -143,10 +142,10 @@ class FormElementAdapter(
         private val inputLayout: TextInputLayout = itemView.findViewById(R.id.input_layout)
         private val selectDate: TextView = itemView.findViewById(R.id.textView_select_date)
         fun bind(position: Int) = with(itemView) {
-            val formElementDateAndTime =  (items[position] as FormElementDateAndTime)
+            val formElementDateAndTime =  items[position]
             if(!formElementDateAndTime.isVisible) this.visibility = View.VISIBLE
             else this.visibility = View.GONE
-            val mandatoryAsterisks = if(formElementDateAndTime.isMandatory) "*" else "" //let user know that field is mandatory
+            val mandatoryAsterisks = if(formElementDateAndTime.isMandatory!!) "*" else "" //let user know that field is mandatory
             inputLayout.hint = "${formElementDateAndTime.label}  $mandatoryAsterisks"
 
             setOnClickListener {
@@ -159,7 +158,7 @@ class FormElementAdapter(
                 datePickerDialog.show()
             }
             var userResponse = formElementDateAndTime.userResponse
-            inputText.setText(userResponse ?: "")
+            inputText.setText(userResponse?.stringResponse ?: "")
             inputText.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) {
 
@@ -168,7 +167,7 @@ class FormElementAdapter(
 
                 }
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    (items[position] as FormElementDateAndTime).userResponse = s.toString()
+                    formElementDateAndTime.userResponse = FormResponse(stringResponse = s.toString())
                     listener(items)
                 }
             })
@@ -190,65 +189,35 @@ class FormElementAdapter(
         private val inputText: TextInputEditText = itemView.findViewById(R.id.input_text)
         private val inputLayout: TextInputLayout = itemView.findViewById(R.id.input_layout)
         fun bind(position: Int) = with(itemView) {
-            val formElementNumeric =  (items[position] as FormElementFormattedNumeric)
+            val formElementNumeric =  items[position]
             if(!formElementNumeric.isVisible) this.visibility = View.VISIBLE
             else this.visibility = View.GONE
-            val mandatoryAsterisks = if(formElementNumeric.isMandatory) "*" else "" //let user know that field is mandatory
+            val mandatoryAsterisks = if(formElementNumeric.isMandatory!!) "*" else "" //let user know that field is mandatory
             inputLayout.hint = "${formElementNumeric.label}  $mandatoryAsterisks"
 
             var userResponse = formElementNumeric.userResponse
-            inputText.setText(userResponse ?: "")
+            inputText.setText(userResponse?.stringResponse ?: "")
             inputText.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) {
                 }
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
                 }
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    (items[position] as FormElementFormattedNumeric).userResponse = s.toString()
+                    formElementNumeric.userResponse = FormResponse(stringResponse = s.toString())
                     listener(items)
                 }
             })
         }
     }
 
-    fun pageRuleChanged(rules: List<Rules?>, hideAction:Boolean){
+    fun applyRulesToFormElement(rules: List<Rules?>, hideAction:Boolean){
         for(i in rules){
             val targetsList = i!!.targets
             Log.e("tag", "targets $targetsList")
             items.map {
-                if(targetsList.contains(it.elementUniqueId)){
-                    it.elementIsVisible = hideAction
+                if(targetsList.contains(it.uniqueId)){
+                    it.isVisible = hideAction
                 }
-                /*when (it.formType) {
-                    FormElementType.YES_OR_NO -> {
-                        val formElement = it as FormElementYesOrNo
-                        if(targetsList.contains(formElement.uniqueId)){
-                            formElement.isVisible = hideAction
-                        }
-                    }
-                    FormElementType.EMBEDDED_PHOTO -> {
-                        //do nothing
-                    }
-                    FormElementType.FORMATTED_NUMERIC -> {
-                        val formElement = it as FormElementFormattedNumeric
-                        if(targetsList.contains(formElement.uniqueId)){
-                            formElement.isVisible = hideAction
-                        }
-                    }
-                    FormElementType.DATE_TIME -> {
-                        val formElement = it as FormElementDateAndTime
-                        if(targetsList.contains(formElement.uniqueId)){
-                            formElement.isVisible = hideAction
-                        }
-                    }
-                    else -> {
-                        val formElement = it as FormElementText
-                        if(targetsList.contains(formElement.uniqueId)){
-                            formElement.isVisible = hideAction
-                        }
-                    }
-                }*/
-
             }
         }
         notifyDataSetChanged()

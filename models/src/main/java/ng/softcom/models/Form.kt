@@ -1,5 +1,6 @@
 package ng.softcom.models
 
+import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 data class Form(
@@ -22,56 +23,62 @@ enum class FormElementType {
     YES_OR_NO, TEXT, EMBEDDED_PHOTO, FORMATTED_NUMERIC, DATE_TIME
 }
 
-open class FormElement(var formType: FormElementType,
-                       var elementUniqueId: String,
-                       var elementIsMandatory: Boolean = true,
-                       var elementRules: List<Rules?>,
-                       var elementIsVisible:Boolean = true)
+open  class FormElement{
+    //using transient prevent gson from deserializing the variable
+    open val label: String get() {return label}
+    open val formType: FormElementType get() { return formType }
+    open val uniqueId: String get() {return uniqueId}
+    open val isMandatory: Boolean? get() {return isMandatory}
+    open val rules: List<Rules?> get() {return rules}
+    open var userResponse:FormResponse? = null
+    open var isVisible: Boolean = true
+
+}
+
+data class FormResponse(var stringResponse:String? = null,
+                        var booleanResponse:Boolean? = false)
+
 
 data class FormElementText(
-    val label: String,
-    val isMandatory: Boolean,
-    @SerializedName("unique_id") val uniqueId: String,
-    val rules: List<Rules?>,
-    var userResponse: String?,
-    var isVisible:Boolean = true
-) : FormElement(FormElementType.TEXT, uniqueId, isMandatory, rules, isVisible)
+    @Expose override var formType: FormElementType = FormElementType.TEXT,
+    override val label: String,
+    override val isMandatory: Boolean,
+    @SerializedName("unique_id") override val uniqueId: String,
+    override val rules: List<Rules?>
+) : FormElement() //FormElementType.TEXT, uniqueId, isMandatory, rules, isVisible)
 
 data class FormElementYesOrNo(
-    val label: String,
-    val isMandatory: Boolean,
-    @SerializedName("unique_id") val uniqueId: String,
-    val rules: List<Rules?>,
-    var userResponseIsYes: Boolean?,
-    var isVisible:Boolean = true
-) : FormElement(FormElementType.YES_OR_NO, uniqueId, isMandatory, rules, isVisible)
+    @Expose override var formType: FormElementType = FormElementType.YES_OR_NO,
+    override val label: String,
+    override val isMandatory: Boolean,
+    @SerializedName("unique_id") override val uniqueId: String,
+    override val rules: List<Rules?>
+) : FormElement() //FormElementType.YES_OR_NO, uniqueId, isMandatory, rules, isVisible)
 
 data class FormElementEmbeddedPhoto(
+    @Expose override var formType: FormElementType = FormElementType.EMBEDDED_PHOTO,
     val file: String,
-    @SerializedName("unique_id") val uniqueId: String,
-    val rules: List<Rules?>
-) : FormElement(FormElementType.EMBEDDED_PHOTO, uniqueId,true, rules, true)
+    override val rules: List<Rules?>
+) : FormElement() // FormElementType.EMBEDDED_PHOTO)
 
 data class FormElementFormattedNumeric(
-    val label: String,
+    @Expose override var formType: FormElementType = FormElementType.FORMATTED_NUMERIC,
+    override val label: String,
     val keyboard: String,
-    @SerializedName("formattedNumeric")val formatPattern: String,
-    val isMandatory: Boolean,
-    @SerializedName("unique_id")val uniqueId: String,
-    val rules: List<Rules?>,
-    var userResponse: String?,
-    var isVisible:Boolean = true
-) : FormElement(FormElementType.FORMATTED_NUMERIC, uniqueId,isMandatory, rules, isVisible)
+    @SerializedName("formattedNumeric") val formatPattern: String,
+    override val isMandatory: Boolean,
+    @SerializedName("unique_id") override val uniqueId: String,
+    override val rules: List<Rules?>
+) : FormElement() //FormElementType.FORMATTED_NUMERIC, uniqueId, isMandatory, rules, isVisible)
 
 data class FormElementDateAndTime(
-    val label: String,
+    @Expose override var formType: FormElementType = FormElementType.DATE_TIME,
+    override val label: String,
     val mode: String,
-    val isMandatory: Boolean,
-    @SerializedName("unique_id") val uniqueId: String,
-    val rules: List<Rules?>,
-    var userResponse: String?,
-    var isVisible:Boolean = true
-) : FormElement(FormElementType.DATE_TIME, uniqueId, isMandatory, rules, isVisible)
+    override val isMandatory: Boolean,
+    @SerializedName("unique_id") override val uniqueId: String,
+    override val rules: List<Rules?>
+) : FormElement() //FormElementType.DATE_TIME, uniqueId, isMandatory, rules, isVisible)
 
 data class Rules(
     val condition: String,
