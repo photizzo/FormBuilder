@@ -1,6 +1,7 @@
 package ng.softcom.mobileui.adapters
 
 import android.app.DatePickerDialog
+import android.text.Editable
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioGroup
@@ -19,10 +20,10 @@ import java.util.*
 
 class FormElementAdapter(
     var items: List<FormElement>,
-    private val listener: (List<FormElement>) -> Unit
+    private val textWatcherListeners: (List<FormElement>) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-
+    val listeners = mutableListOf<SoftFormTextWatcher?>()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             YES_OR_NO -> {
@@ -88,23 +89,32 @@ class FormElementAdapter(
     inner class TextViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val inputText: TextInputEditText = itemView.findViewById(R.id.input_text)
         private val inputLayout: TextInputLayout = itemView.findViewById(R.id.input_layout)
+
         fun bind(position: Int) = with(itemView) {
             val formElementText = items[position]
+            listeners.map { inputText.removeTextChangedListener(it) }
+
+            val textWatcher = object : SoftFormTextWatcher() {
+                override fun afterTextChanged(s: Editable?) {
+                    super.afterTextChanged(s)
+                    formElementText.userResponse = FormResponse(stringResponse = s.toString())
+                    textWatcherListeners(items)
+                }
+                override fun checkAndApplyFormRules(s: CharSequence) {
+                    super.checkAndApplyFormRules(s)
+                    applyRulesToFormElement(formElementText.rules, s.toString())
+                }
+            }
+
             changeFormElementVisibility(this, !formElementText.isVisible)
             //update form element label
             val mandatoryAsterisks =
                 if (formElementText.isMandatory!!) "*" else "" //let user know that field is mandatory
+
             inputLayout.hint = "${formElementText.label}  $mandatoryAsterisks"
             inputText.setText(formElementText.userResponse?.stringResponse ?: "")
-            inputText.addTextChangedListener(object : SoftFormTextWatcher() {
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-//                    applyRulesToFormElement(formElementText.rules, s.toString())
-                    formElementText.userResponse = FormResponse(stringResponse = s.toString())
-                    listener(items)
-                }
-            })
-
-
+            inputText.addTextChangedListener(textWatcher)
+            listeners.add(textWatcher as SoftFormTextWatcher)
         }
     }
 
@@ -123,14 +133,12 @@ class FormElementAdapter(
             radioGroup.setOnCheckedChangeListener { group, checkedId ->
                 formElementYesOrNo.userResponse = FormResponse(booleanResponse = checkedId == R.id.radioButton_yes)
 
-
                 if (formElementYesOrNo.rules.isNotEmpty()) {
                     if (checkedId == R.id.radioButton_yes)
                         applyRulesToFormElement(formElementYesOrNo.rules, "Yes")
                     else applyRulesToFormElement(formElementYesOrNo.rules, "No")
                 }
-
-                listener(items)
+                textWatcherListeners(items)
             }
         }
     }
@@ -140,6 +148,18 @@ class FormElementAdapter(
         private val inputLayout: TextInputLayout = itemView.findViewById(R.id.input_layout)
         fun bind(position: Int) = with(itemView) {
             val formElementDateAndTime = items[position]
+            listeners.map { inputText.removeTextChangedListener(it) }
+            val textWatcher = object : SoftFormTextWatcher() {
+                override fun afterTextChanged(s: Editable?) {
+                    super.afterTextChanged(s)
+                    formElementDateAndTime.userResponse = FormResponse(stringResponse = s.toString())
+                    textWatcherListeners(items)
+                }
+                override fun checkAndApplyFormRules(s: CharSequence) {
+                    super.checkAndApplyFormRules(s)
+                    applyRulesToFormElement(formElementDateAndTime.rules, s.toString())
+                }
+            }
             changeFormElementVisibility(this, !formElementDateAndTime.isVisible)
             //update form element label
             val mandatoryAsterisks =
@@ -158,13 +178,8 @@ class FormElementAdapter(
                 datePickerDialog.show()
             }
             inputText.setText(formElementDateAndTime.userResponse?.stringResponse ?: "")
-            inputText.addTextChangedListener(object : SoftFormTextWatcher() {
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-//                    applyRulesToFormElement(formElementDateAndTime.rules, s.toString())
-                    formElementDateAndTime.userResponse = FormResponse(stringResponse = s.toString())
-                    listener(items)
-                }
-            })
+            inputText.addTextChangedListener(textWatcher)
+            listeners.add(textWatcher as SoftFormTextWatcher)
         }
     }
 
@@ -176,6 +191,8 @@ class FormElementAdapter(
                 .centerCrop()
                 .placeholder(R.drawable.form_icon)
                 .into(imageview)
+
+            applyRulesToFormElement(items[position].rules, "")
         }
     }
 
@@ -184,20 +201,26 @@ class FormElementAdapter(
         private val inputLayout: TextInputLayout = itemView.findViewById(R.id.input_layout)
         fun bind(position: Int) = with(itemView) {
             val formElementNumeric = items[position]
+            listeners.map { inputText.removeTextChangedListener(it) }
+            val textWatcher = object : SoftFormTextWatcher() {
+                override fun afterTextChanged(s: Editable?) {
+                    super.afterTextChanged(s)
+                    formElementNumeric.userResponse = FormResponse(stringResponse = s.toString())
+                    textWatcherListeners(items)
+                }
+                override fun checkAndApplyFormRules(s: CharSequence) {
+                    super.checkAndApplyFormRules(s)
+                    applyRulesToFormElement(formElementNumeric.rules, s.toString())
+                }
+            }
             changeFormElementVisibility(this, !formElementNumeric.isVisible)
             //update form element label
             val mandatoryAsterisks =
                 if (formElementNumeric.isMandatory!!) "*" else "" //let user know that field is mandatory
             inputLayout.hint = "${formElementNumeric.label}  $mandatoryAsterisks"
-
             inputText.setText(formElementNumeric.userResponse?.stringResponse ?: "")
-            inputText.addTextChangedListener(object : SoftFormTextWatcher() {
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-//                    applyRulesToFormElement(formElementNumeric.rules, s.toString())
-                    formElementNumeric.userResponse = FormResponse(stringResponse = s.toString())
-                    listener(items)
-                }
-            })
+            inputText.addTextChangedListener(textWatcher)
+            listeners.add(textWatcher as SoftFormTextWatcher)
         }
     }
 
