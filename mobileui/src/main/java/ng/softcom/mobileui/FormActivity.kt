@@ -83,7 +83,7 @@ class FormActivity : DaggerAppCompatActivity() {
         binding.pager.setMyScroller() //enable smooth scroll on non-swipeableViewPager
         // The pager adapter, which provides the pages to the view pager widget.
         val pagerAdapter = FormPagerAdapter(supportFragmentManager)
-        binding.pager.adapter = pagerAdapterx
+        binding.pager.adapter = pagerAdapter
     }
 
     private fun handleFormDataState(resource: Resource<Form>) {
