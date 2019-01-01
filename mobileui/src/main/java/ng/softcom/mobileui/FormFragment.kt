@@ -129,9 +129,7 @@ class FormFragment : Fragment() {
                         allMandatoryQuestionsAnswered =
                                 if (formElement.isMandatory) {
                                     formElement.userResponseIsYes != null
-                                } else {
-                                    true
-                                }
+                                } else allMandatoryQuestionsAnswered
                     }
                     FormElementType.EMBEDDED_PHOTO -> {
                         //do nothing
@@ -141,27 +139,21 @@ class FormFragment : Fragment() {
                         allMandatoryQuestionsAnswered =
                                 if (formElement.isMandatory) {
                                     formElement.userResponse != null && formElement.userResponse!!.isNotEmpty()
-                                } else {
-                                    true
-                                }
+                                } else allMandatoryQuestionsAnswered
                     }
                     FormElementType.DATE_TIME -> {
                         val formElement = j as FormElementDateAndTime
                         allMandatoryQuestionsAnswered =
                                 if (formElement.isMandatory) {
                                     formElement.userResponse != null && formElement.userResponse!!.isNotEmpty()
-                                } else {
-                                    true
-                                }
+                                } else allMandatoryQuestionsAnswered
                     }
                     else -> {
                         val formElement = j as FormElementText
                         allMandatoryQuestionsAnswered =
                                 if (formElement.isMandatory) {
                                     formElement.userResponse != null && formElement.userResponse!!.isNotEmpty()
-                                } else {
-                                    true
-                                }
+                                } else allMandatoryQuestionsAnswered
                     }
                 }
             }

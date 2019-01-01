@@ -22,7 +22,11 @@ enum class FormElementType {
     YES_OR_NO, TEXT, EMBEDDED_PHOTO, FORMATTED_NUMERIC, DATE_TIME
 }
 
-open class FormElement(var formType: FormElementType)
+open class FormElement(var formType: FormElementType,
+                       var elementUniqueId: String,
+                       var elementIsMandatory: Boolean = true,
+                       var elementRules: List<Rules?>,
+                       var elementIsVisible:Boolean = true)
 
 data class FormElementText(
     val label: String,
@@ -31,7 +35,7 @@ data class FormElementText(
     val rules: List<Rules?>,
     var userResponse: String?,
     var isVisible:Boolean = true
-) : FormElement(FormElementType.TEXT)
+) : FormElement(FormElementType.TEXT, uniqueId, isMandatory, rules, isVisible)
 
 data class FormElementYesOrNo(
     val label: String,
@@ -40,13 +44,13 @@ data class FormElementYesOrNo(
     val rules: List<Rules?>,
     var userResponseIsYes: Boolean?,
     var isVisible:Boolean = true
-) : FormElement(FormElementType.YES_OR_NO)
+) : FormElement(FormElementType.YES_OR_NO, uniqueId, isMandatory, rules, isVisible)
 
 data class FormElementEmbeddedPhoto(
     val file: String,
     @SerializedName("unique_id") val uniqueId: String,
     val rules: List<Rules?>
-) : FormElement(FormElementType.EMBEDDED_PHOTO)
+) : FormElement(FormElementType.EMBEDDED_PHOTO, uniqueId,true, rules, true)
 
 data class FormElementFormattedNumeric(
     val label: String,
@@ -57,7 +61,7 @@ data class FormElementFormattedNumeric(
     val rules: List<Rules?>,
     var userResponse: String?,
     var isVisible:Boolean = true
-) : FormElement(FormElementType.FORMATTED_NUMERIC)
+) : FormElement(FormElementType.FORMATTED_NUMERIC, uniqueId,isMandatory, rules, isVisible)
 
 data class FormElementDateAndTime(
     val label: String,
@@ -67,7 +71,7 @@ data class FormElementDateAndTime(
     val rules: List<Rules?>,
     var userResponse: String?,
     var isVisible:Boolean = true
-) : FormElement(FormElementType.DATE_TIME)
+) : FormElement(FormElementType.DATE_TIME, uniqueId, isMandatory, rules, isVisible)
 
 data class Rules(
     val condition: String,

@@ -216,7 +216,10 @@ class FormElementAdapter(
             val targetsList = i!!.targets
             Log.e("tag", "targets $targetsList")
             items.map {
-                when (it.formType) {
+                if(targetsList.contains(it.elementUniqueId)){
+                    it.elementIsVisible = hideAction
+                }
+                /*when (it.formType) {
                     FormElementType.YES_OR_NO -> {
                         val formElement = it as FormElementYesOrNo
                         if(targetsList.contains(formElement.uniqueId)){
@@ -244,7 +247,7 @@ class FormElementAdapter(
                             formElement.isVisible = hideAction
                         }
                     }
-                }
+                }*/
 
             }
         }
