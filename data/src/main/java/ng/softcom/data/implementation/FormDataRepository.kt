@@ -197,17 +197,29 @@ class FormDataRepository @Inject constructor() : FormRepository {
             for (j in i.section) {
                 for (k in j.elements) {
                     if(k.rules.isNotEmpty()){
-                        applyRulesToFormElement(k.rules, j.elements)
+                        applyRulesToFormElement(k.rules, j.elements, "")
                     }
                 }
             }
         }
     }
-    private fun applyRulesToFormElement(rules: List<Rules?>, items: List<FormElement>) {
-        for (i in rules) {
+    private fun applyRulesToFormElement(rules: List<Rules?>, items: List<FormElement>, value:String) {
+        /*for (i in rules) {
             val targetsList = i!!.targets
             items.map {
                 it.isVisible = targetsList.contains(it.uniqueId)
+            }
+        }*/
+        for (i in rules) {
+            val targetsList = i!!.targets
+            items.map {
+                if (targetsList.contains(it.uniqueId)) {
+                    val isConditionMet = i.value == value
+                    val isShow = i.action == "show"
+                    if (isConditionMet)
+                        it.isVisible = !isShow
+                    else it.isVisible = isShow
+                }
             }
         }
     }

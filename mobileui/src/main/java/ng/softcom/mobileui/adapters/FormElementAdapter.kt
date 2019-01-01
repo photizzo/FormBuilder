@@ -1,9 +1,6 @@
 package ng.softcom.mobileui.adapters
 
 import android.app.DatePickerDialog
-import android.text.Editable
-import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioGroup
@@ -14,6 +11,7 @@ import com.google.android.material.textfield.TextInputLayout
 import de.hdodenhof.circleimageview.CircleImageView
 import ng.softcom.mobileui.R
 import ng.softcom.mobileui.injection.GlideApp
+import ng.softcom.mobileui.utils.SoftFormTextWatcher
 import ng.softcom.mobileui.utils.inflate
 import ng.softcom.models.*
 import java.util.*
@@ -46,7 +44,7 @@ class FormElementAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when(items[position].formType){
+        return when (items[position].formType) {
             FormElementType.YES_OR_NO -> {
                 YES_OR_NO
             }
@@ -66,7 +64,7 @@ class FormElementAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when(items[position].formType){
+        when (items[position].formType) {
             FormElementType.YES_OR_NO -> {
                 (holder as YesOrNoViewHolder).bind(position)
             }
@@ -91,44 +89,45 @@ class FormElementAdapter(
         private val inputText: TextInputEditText = itemView.findViewById(R.id.input_text)
         private val inputLayout: TextInputLayout = itemView.findViewById(R.id.input_layout)
         fun bind(position: Int) = with(itemView) {
-            val formElementText =  items[position]
-            if(!formElementText.isVisible) this.visibility = View.VISIBLE
-            else this.visibility = View.GONE
-            val mandatoryAsterisks = if(formElementText.isMandatory!!) "*" else "" //let user know that field is mandatory
+            val formElementText = items[position]
+            changeFormElementVisibility(this, !formElementText.isVisible)
+            //update form element label
+            val mandatoryAsterisks =
+                if (formElementText.isMandatory!!) "*" else "" //let user know that field is mandatory
             inputLayout.hint = "${formElementText.label}  $mandatoryAsterisks"
-
-            var userResponse = formElementText.userResponse
-            inputText.setText(userResponse?.stringResponse ?: "")
-            inputText.addTextChangedListener(object : TextWatcher {
-                override fun afterTextChanged(s: Editable?) {
-                }
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                }
+            inputText.setText(formElementText.userResponse?.stringResponse ?: "")
+            inputText.addTextChangedListener(object : SoftFormTextWatcher() {
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+//                    applyRulesToFormElement(formElementText.rules, s.toString())
                     formElementText.userResponse = FormResponse(stringResponse = s.toString())
                     listener(items)
                 }
             })
+
+
         }
     }
 
     inner class YesOrNoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val sectionNameTv: TextView = itemView.findViewById(R.id.textview_label)
-        private val radibGroup:RadioGroup = itemView.findViewById(R.id.radiogroup_yes_or_no)
+        private val radioGroup: RadioGroup = itemView.findViewById(R.id.radiogroup_yes_or_no)
         fun bind(position: Int) = with(itemView) {
-            val formElementYesOrNo =  items[position]
-            if(!formElementYesOrNo.isVisible) this.visibility = View.VISIBLE
-            else this.visibility = View.GONE
-            val mandatoryAsterisks = if(formElementYesOrNo.isMandatory!!) "*" else "" //let user know that field is mandatory
+            val formElementYesOrNo = items[position]
+            changeFormElementVisibility(this, !formElementYesOrNo.isVisible)
+            //update form element label
+            val mandatoryAsterisks =
+                if (formElementYesOrNo.isMandatory!!) "*" else "" //let user know that field is mandatory
             sectionNameTv.text = "${formElementYesOrNo.label}  $mandatoryAsterisks"
 
 
-            radibGroup.setOnCheckedChangeListener { group, checkedId ->
+            radioGroup.setOnCheckedChangeListener { group, checkedId ->
                 formElementYesOrNo.userResponse = FormResponse(booleanResponse = checkedId == R.id.radioButton_yes)
-                if (formElementYesOrNo.rules.isNotEmpty()){
-                    if(checkedId == R.id.radioButton_yes)
-                        applyRulesToFormElement(formElementYesOrNo.rules, false)
-                    else applyRulesToFormElement(formElementYesOrNo.rules, true)
+
+
+                if (formElementYesOrNo.rules.isNotEmpty()) {
+                    if (checkedId == R.id.radioButton_yes)
+                        applyRulesToFormElement(formElementYesOrNo.rules, "Yes")
+                    else applyRulesToFormElement(formElementYesOrNo.rules, "No")
                 }
 
                 listener(items)
@@ -140,31 +139,28 @@ class FormElementAdapter(
         private val inputText: TextInputEditText = itemView.findViewById(R.id.input_text)
         private val inputLayout: TextInputLayout = itemView.findViewById(R.id.input_layout)
         fun bind(position: Int) = with(itemView) {
-            val formElementDateAndTime =  items[position]
-            if(!formElementDateAndTime.isVisible) this.visibility = View.VISIBLE
-            else this.visibility = View.GONE
-            val mandatoryAsterisks = if(formElementDateAndTime.isMandatory!!) "*" else "" //let user know that field is mandatory
+            val formElementDateAndTime = items[position]
+            changeFormElementVisibility(this, !formElementDateAndTime.isVisible)
+            //update form element label
+            val mandatoryAsterisks =
+                if (formElementDateAndTime.isMandatory!!) "*" else "" //let user know that field is mandatory
             inputLayout.hint = "${formElementDateAndTime.label}  $mandatoryAsterisks"
 
             setOnClickListener {
                 val calender = Calendar.getInstance()
-                val datePickerDialog = DatePickerDialog(context,
-                    DatePickerDialog.OnDateSetListener {
-                            view, year, month, dayOfMonth -> inputText.setText("$year-$month-$dayOfMonth")
+                val datePickerDialog = DatePickerDialog(
+                    context,
+                    DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
+                        inputText.setText("$year-${month + 1}-$dayOfMonth")
                     },
-                    calender.get(Calendar.YEAR), calender.get(Calendar.MONTH), calender.get(Calendar.DAY_OF_MONTH))
+                    calender.get(Calendar.YEAR), calender.get(Calendar.MONTH), calender.get(Calendar.DAY_OF_MONTH)
+                )
                 datePickerDialog.show()
             }
-            var userResponse = formElementDateAndTime.userResponse
-            inputText.setText(userResponse?.stringResponse ?: "")
-            inputText.addTextChangedListener(object : TextWatcher {
-                override fun afterTextChanged(s: Editable?) {
-
-                }
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-                }
+            inputText.setText(formElementDateAndTime.userResponse?.stringResponse ?: "")
+            inputText.addTextChangedListener(object : SoftFormTextWatcher() {
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+//                    applyRulesToFormElement(formElementDateAndTime.rules, s.toString())
                     formElementDateAndTime.userResponse = FormResponse(stringResponse = s.toString())
                     listener(items)
                 }
@@ -187,20 +183,17 @@ class FormElementAdapter(
         private val inputText: TextInputEditText = itemView.findViewById(R.id.input_text)
         private val inputLayout: TextInputLayout = itemView.findViewById(R.id.input_layout)
         fun bind(position: Int) = with(itemView) {
-            val formElementNumeric =  items[position]
-            if(!formElementNumeric.isVisible) this.visibility = View.VISIBLE
-            else this.visibility = View.GONE
-            val mandatoryAsterisks = if(formElementNumeric.isMandatory!!) "*" else "" //let user know that field is mandatory
+            val formElementNumeric = items[position]
+            changeFormElementVisibility(this, !formElementNumeric.isVisible)
+            //update form element label
+            val mandatoryAsterisks =
+                if (formElementNumeric.isMandatory!!) "*" else "" //let user know that field is mandatory
             inputLayout.hint = "${formElementNumeric.label}  $mandatoryAsterisks"
 
-            var userResponse = formElementNumeric.userResponse
-            inputText.setText(userResponse?.stringResponse ?: "")
-            inputText.addTextChangedListener(object : TextWatcher {
-                override fun afterTextChanged(s: Editable?) {
-                }
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                }
+            inputText.setText(formElementNumeric.userResponse?.stringResponse ?: "")
+            inputText.addTextChangedListener(object : SoftFormTextWatcher() {
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+//                    applyRulesToFormElement(formElementNumeric.rules, s.toString())
                     formElementNumeric.userResponse = FormResponse(stringResponse = s.toString())
                     listener(items)
                 }
@@ -208,17 +201,25 @@ class FormElementAdapter(
         }
     }
 
-    fun applyRulesToFormElement(rules: List<Rules?>, hideAction:Boolean){
-        for(i in rules){
+    fun applyRulesToFormElement(rules: List<Rules?>, value: String) {
+        for (i in rules) {
             val targetsList = i!!.targets
-            Log.e("tag", "targets $targetsList")
             items.map {
-                if(targetsList.contains(it.uniqueId)){
-                    it.isVisible = hideAction
+                if (targetsList.contains(it.uniqueId)) {
+                    val isConditionMet = i.value == value
+                    val isShow = i.action == "show"
+                    if (isConditionMet)
+                        it.isVisible = !isShow
+                    else it.isVisible = isShow
                 }
             }
         }
         notifyDataSetChanged()
+    }
+
+    fun changeFormElementVisibility(view: View, status: Boolean) {
+        if (status) view.visibility = View.VISIBLE
+        else view.visibility = View.GONE
     }
 
     companion object {
