@@ -160,6 +160,7 @@ class FormDataRepository @Inject constructor() : FormRepository {
                         "embeddedphoto" -> {
                             val photo = Gson().fromJson(formElement, FormElementEmbeddedPhoto::class.java)
                             photo.formType = FormElementType.EMBEDDED_PHOTO
+                            photo.uniqueId = ""
                             photo
                         }
                         "formattednumeric" -> {

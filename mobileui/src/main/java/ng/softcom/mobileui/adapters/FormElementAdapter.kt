@@ -170,7 +170,7 @@ class FormElementAdapter(
                 .placeholder(R.drawable.form_icon)
                 .into(imageview)
 
-//            applyRulesToFormElement(items[position].rules, "")
+            applyRulesToFormElement((items[position] as FormElementEmbeddedPhoto).rules, "")
         }
     }
 
