@@ -27,7 +27,7 @@ open  class FormElement{
     //using transient prevent gson from deserializing the variable
     open val label: String get() {return label}
     open val formType: FormElementType get() { return formType }
-    open val uniqueId: String get() {return uniqueId}
+    open var uniqueId: String = ""
     open val isMandatory: Boolean? get() {return isMandatory}
     open val rules: List<Rules?> get() {return rules}
     open var userResponse:FormResponse? = null
@@ -43,7 +43,7 @@ data class FormElementText(
     @Expose override var formType: FormElementType = FormElementType.TEXT,
     override val label: String,
     override val isMandatory: Boolean,
-    @SerializedName("unique_id") override val uniqueId: String,
+    @SerializedName("unique_id") override var uniqueId: String,
     override val rules: List<Rules?>
 ) : FormElement() //FormElementType.TEXT, uniqueId, isMandatory, rules, isVisible)
 
@@ -51,7 +51,7 @@ data class FormElementYesOrNo(
     @Expose override var formType: FormElementType = FormElementType.YES_OR_NO,
     override val label: String,
     override val isMandatory: Boolean,
-    @SerializedName("unique_id") override val uniqueId: String,
+    @SerializedName("unique_id") override var uniqueId: String,
     override val rules: List<Rules?>
 ) : FormElement() //FormElementType.YES_OR_NO, uniqueId, isMandatory, rules, isVisible)
 
@@ -67,7 +67,7 @@ data class FormElementFormattedNumeric(
     val keyboard: String,
     @SerializedName("formattedNumeric") val formatPattern: String,
     override val isMandatory: Boolean,
-    @SerializedName("unique_id") override val uniqueId: String,
+    @SerializedName("unique_id") override var uniqueId: String,
     override val rules: List<Rules?>
 ) : FormElement() //FormElementType.FORMATTED_NUMERIC, uniqueId, isMandatory, rules, isVisible)
 
@@ -76,7 +76,7 @@ data class FormElementDateAndTime(
     override val label: String,
     val mode: String,
     override val isMandatory: Boolean,
-    @SerializedName("unique_id") override val uniqueId: String,
+    @SerializedName("unique_id") override var uniqueId: String,
     override val rules: List<Rules?>
 ) : FormElement() //FormElementType.DATE_TIME, uniqueId, isMandatory, rules, isVisible)
 
