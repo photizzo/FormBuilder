@@ -49,7 +49,7 @@ class FormActivity : DaggerAppCompatActivity() {
                 handleCurrentPageDataState(it)
             }
         })
-        getFormViewModel.getFormData()
+        if(getFormViewModel.getFormLiveData().value?.data?.pages == null) getFormViewModel.getFormData()
     }
 
     override fun onBackPressed() {
@@ -68,7 +68,9 @@ class FormActivity : DaggerAppCompatActivity() {
      */
     private inner class FormPagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {
 
-        override fun getCount(): Int = getFormViewModel.getFormLiveData().value?.data?.pages?.size!!
+        override fun getCount(): Int {
+            return getFormViewModel.getFormLiveData().value?.data?.pages?.size!!
+        }
 
         override fun getItem(position: Int): Fragment {
             val bundle = Bundle()
@@ -91,7 +93,9 @@ class FormActivity : DaggerAppCompatActivity() {
         when (resource.status) {
             ResourceState.SUCCESS -> {
                 binding.textViewToolbar.text = resource.data?.label
-                getFormViewModel.getCurrentPageLiveData().value = 0//initialize current page to page 1
+                if(getFormViewModel.getCurrentPageLiveData().value == null)
+                    getFormViewModel.getCurrentPageLiveData().value = 0//initialize current page to page 1
+                else getFormViewModel.getCurrentPageLiveData().value = getFormViewModel.getCurrentPageLiveData().value
                 initFormViewPager()
             }
             ResourceState.LOADING -> {

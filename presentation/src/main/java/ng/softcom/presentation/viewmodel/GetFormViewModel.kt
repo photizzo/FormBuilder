@@ -16,6 +16,7 @@ class GetFormViewModel @Inject internal constructor(
     private val currentPageLiveData:MutableLiveData<Int> = MutableLiveData()
 
     override fun onCleared() {
+        println("view model cleared")
         super.onCleared()
         getFormData.dispose()
     }
