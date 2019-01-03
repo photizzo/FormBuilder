@@ -126,7 +126,7 @@ class FormElementAdapter(
                 val isYes = formElementYesOrNo.userResponse!!.booleanResponse
                 if(isYes!!) radioButtonYes.isChecked = true else radioButtonNo.isChecked = true
             }
-            
+
             radioGroup.setOnCheckedChangeListener { group, checkedId ->
                 formElementYesOrNo.userResponse = FormResponse(booleanResponse = checkedId == R.id.radioButton_yes)
 
