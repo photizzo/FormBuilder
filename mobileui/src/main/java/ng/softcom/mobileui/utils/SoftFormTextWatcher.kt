@@ -33,8 +33,6 @@ abstract class SoftFormTextWatcher : TextWatcher {
 
     }
 
-    abstract fun updateNumberFormat(s: CharSequence?)
-
     open fun applyNumberFormatting(pattern: String) {
         mask = pattern
     }

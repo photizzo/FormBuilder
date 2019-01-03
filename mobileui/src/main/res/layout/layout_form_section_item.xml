@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <TextView
         android:id="@+id/textView_section_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
         android:fontFamily="@font/nunito_bold"
         android:text="Welcome to Pets Rescue"
-        android:layout_marginRight="16dp"
-        android:layout_marginLeft="16dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         android:textColor="@color/textNormal" />
 
@@ -21,17 +21,38 @@
         android:id="@+id/cardview_section"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardElevation="4dp"
-        android:layout_marginRight="16dp"
         android:layout_marginLeft="16dp"
         android:layout_marginTop="4dp"
-        android:layout_marginBottom="24dp">
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView_element"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="24dp"
+        app:cardElevation="4dp">
+
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            tools:listitem="@layout/layout_form_element_text" />
+            android:orientation="vertical">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView_element"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                tools:listitem="@layout/layout_form_element_text" />
+
+            <TextView
+                android:id="@+id/empty_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/nunito_extrabold"
+                android:gravity="center"
+                android:text="@string/no_data_available"
+                android:visibility="gone"
+                android:padding="16dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                android:textColor="@color/textNormal"
+                />
+        </FrameLayout>
+
 
     </androidx.cardview.widget.CardView>
 </LinearLayout>

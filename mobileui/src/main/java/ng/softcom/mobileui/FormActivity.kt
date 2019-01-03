@@ -3,6 +3,7 @@ package ng.softcom.mobileui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -98,6 +99,8 @@ class FormActivity : DaggerAppCompatActivity() {
             }
             ResourceState.ERROR -> {
                 //show error toast
+                binding.pager.visibility = View.GONE
+                binding.emptyView.visibility = View.VISIBLE
             }
         }
     }

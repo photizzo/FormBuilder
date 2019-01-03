@@ -189,7 +189,6 @@ class FormDataRepository @Inject constructor() : FormRepository {
         val form = Form(label, formPageList)
         applyRulesToForm(form)
 
-        println("myform $form")
         return Observable.just(form)
     }
 

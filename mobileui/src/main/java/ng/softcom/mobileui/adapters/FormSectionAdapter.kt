@@ -29,6 +29,7 @@ class FormSectionAdapter(
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val sectionNameTv: TextView = itemView.findViewById(R.id.textView_section_title)
         private val recyclerView: RecyclerView = itemView.findViewById(R.id.recyclerView_element)
+        private val emptyView: TextView = itemView.findViewById(R.id.empty_view)
 
         fun bind(position: Int, formElementList:List<FormElement>) = with(itemView) {
             sectionNameTv.text = formSectionList[position].label
@@ -38,6 +39,15 @@ class FormSectionAdapter(
         private fun initElementRecyclerView(context:Context, position: Int, formElementList:List<FormElement>) {
             val llm = LinearLayoutManager(context)
             recyclerView.layoutManager = llm
+
+            //handle empty data sets
+            if(formElementList.isEmpty()){
+                recyclerView.visibility = View.GONE
+                emptyView.visibility = View.VISIBLE
+            } else {
+                recyclerView.visibility = View.VISIBLE
+                emptyView.visibility = View.GONE
+            }
 
             val elementAdapter = FormElementAdapter(formElementList){
                 //update the section form elements

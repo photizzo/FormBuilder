@@ -57,9 +57,17 @@ class FormFragment : Fragment() {
         binding.recyclerViewSection.layoutManager = llm
         val currentPagePosition = arguments?.getInt(getString(R.string.page_position_key))
         val currentFormPage = getFormViewModel.getFormLiveData().value?.data!!.pages
+
         val formSections = currentFormPage[currentPagePosition!!].section
+        if(formSections.isEmpty()){
+            binding.recyclerViewSection.visibility = View.GONE
+            binding.emptyView.visibility = View.VISIBLE
+        } else {
+            binding.recyclerViewSection.visibility = View.VISIBLE
+            binding.emptyView.visibility = View.GONE
+        }
         sectionAdapter = FormSectionAdapter(formSections) {
-            //doing nothing here
+            //doing nothing here in this listener
         }
         binding.recyclerViewSection.adapter = sectionAdapter
     }
