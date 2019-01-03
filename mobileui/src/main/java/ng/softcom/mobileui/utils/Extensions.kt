@@ -2,10 +2,14 @@ package ng.softcom.mobileui.utils
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.snackbar.Snackbar
+import java.io.BufferedReader
+import java.io.InputStream
+import java.io.InputStreamReader
 
 
 fun ViewGroup.inflate(layout: Int): View {
@@ -96,4 +100,22 @@ fun String.removeCommas():String{
     return this.replace(",", "-")
 }
 
+fun Context.readJsonFromFilePath(path:String):String{
+    var line: String? = ""
+    try {
+        val inputStream: InputStream = assets.open(path)
+        val inputStreamReader = InputStreamReader(inputStream)
+        val sb = StringBuilder()
+        val br = BufferedReader(inputStreamReader)
+        line = br.readLine()
+        while (br.readLine() != null) {
+            sb.append(line)
+            line = br.readLine()
+        }
+        br.close()
+    } catch (e:Exception){
+        Log.d("tag", e.toString())
+    }
+    return line ?: ""
+}
 

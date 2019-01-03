@@ -119,9 +119,7 @@ class FormFragment : Fragment() {
         }
         binding.includedLastPageControl.buttonSubmit.setOnClickListener {
             if (isAllMandatoryQuestionsAreAnsweredForCurrentPage()) {
-                //todo: add submit in domain repository
-                SuccessActivity.startActivity(activity as Context)
-                activity?.finish()
+                getFormViewModel.submitForm(getFormViewModel.getFormLiveData().value!!.data!!)
 
             } else activity?.showSnackbar("All mandatory field marked * must be filled", Snackbar.LENGTH_LONG)
 

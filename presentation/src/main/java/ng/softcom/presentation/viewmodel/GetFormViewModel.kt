@@ -2,17 +2,21 @@ package ng.softcom.presentation.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import io.reactivex.observers.DisposableCompletableObserver
 import io.reactivex.observers.DisposableObserver
 import ng.softcom.domain.form.GetFormData
+import ng.softcom.domain.form.SubmitForm
 import ng.softcom.models.Form
 import ng.softcom.presentation.state.Resource
 import ng.softcom.presentation.state.ResourceState
 import javax.inject.Inject
 
 class GetFormViewModel @Inject internal constructor(
-    private val getFormData: GetFormData) : ViewModel() {
+    private val getFormData: GetFormData,
+    private val submitForm: SubmitForm) : ViewModel() {
 
     private val formLiveData:MutableLiveData<Resource<Form>> = MutableLiveData()
+    private val submitFormLiveData:MutableLiveData<Resource<Form>> = MutableLiveData()
     private val currentPageLiveData:MutableLiveData<Int> = MutableLiveData()
 
     override fun onCleared() {
@@ -23,6 +27,9 @@ class GetFormViewModel @Inject internal constructor(
 
     fun getFormLiveData():MutableLiveData<Resource<Form>> {
         return formLiveData
+    }
+    fun getSubmitFormLiveData():MutableLiveData<Resource<Form>> {
+        return submitFormLiveData
     }
     fun getCurrentPageLiveData():MutableLiveData<Int> {
         return currentPageLiveData
@@ -35,9 +42,14 @@ class GetFormViewModel @Inject internal constructor(
         currentPageLiveData.value = currentPageLiveData.value?.minus(1)
     }
 
-    fun getFormData(){
+    fun getFormData(string:String){
         formLiveData.postValue(Resource(ResourceState.LOADING, null, null))
-        getFormData.execute(FormSubscriber())
+        getFormData.execute(FormSubscriber(), GetFormData.Params(string))
+    }
+
+    fun submitForm(form:Form){
+        submitFormLiveData.postValue(Resource(ResourceState.LOADING, null, null))
+        submitForm.execute(SubmitFormSubscriber(), SubmitForm.Params(form))
     }
 
     inner class FormSubscriber : DisposableObserver<Form>() {
@@ -50,6 +62,16 @@ class GetFormViewModel @Inject internal constructor(
 
         override fun onError(e: Throwable) {
             formLiveData.postValue(Resource(ResourceState.ERROR, null, e.message))
+        }
+    }
+
+    inner class SubmitFormSubscriber: DisposableCompletableObserver() {
+        override fun onComplete() {
+            submitFormLiveData.postValue(Resource(ResourceState.SUCCESS, null, null))
+        }
+
+        override fun onError(e: Throwable) {
+            submitFormLiveData.postValue(Resource(ResourceState.ERROR, null, e.localizedMessage))
         }
     }
 }

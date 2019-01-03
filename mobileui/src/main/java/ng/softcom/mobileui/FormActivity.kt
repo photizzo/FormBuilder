@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProviders
 import dagger.android.support.DaggerAppCompatActivity
 import ng.softcom.mobileui.databinding.ActivityFormBinding
 import ng.softcom.mobileui.injection.ViewModelFactory
+import ng.softcom.mobileui.utils.readJsonFromFilePath
 import ng.softcom.models.Form
 import ng.softcom.presentation.state.Resource
 import ng.softcom.presentation.state.ResourceState
@@ -43,13 +44,20 @@ class FormActivity : DaggerAppCompatActivity() {
                 handleFormDataState(it)
             }
         })
+        getFormViewModel.getSubmitFormLiveData().observe(this, Observer<Resource<Form>> {
+            it?.let {
+                handleSubmitFormData(it)
+            }
+        })
 
         getFormViewModel.getCurrentPageLiveData().observe(this, Observer<Int> {
             it?.let {
                 handleCurrentPageDataState(it)
             }
         })
-        if(getFormViewModel.getFormLiveData().value?.data?.pages == null) getFormViewModel.getFormData()
+
+        val jsonString = readJsonFromFilePath("jsondata.json")
+        if(getFormViewModel.getFormLiveData().value?.data?.pages == null) getFormViewModel.getFormData(jsonString)
     }
 
     override fun onBackPressed() {
@@ -105,6 +113,20 @@ class FormActivity : DaggerAppCompatActivity() {
                 //show error toast
                 binding.pager.visibility = View.GONE
                 binding.emptyView.visibility = View.VISIBLE
+            }
+        }
+    }
+    private fun handleSubmitFormData(resource: Resource<Form>) {
+        when (resource.status) {
+            ResourceState.SUCCESS -> {
+                SuccessActivity.startActivity(this)
+                finish()
+            }
+            ResourceState.LOADING -> {
+                //show progress bar
+            }
+            ResourceState.ERROR -> {
+                //show error toast
             }
         }
     }

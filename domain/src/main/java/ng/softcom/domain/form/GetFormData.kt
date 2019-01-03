@@ -9,10 +9,21 @@ import javax.inject.Inject
 
 class GetFormData @Inject constructor(
     private val formRepository: FormRepository,
-    postExecutionThread: PostExecutionThread): ObservableUseCase<Form, Nothing>(postExecutionThread) {
+    postExecutionThread: PostExecutionThread): ObservableUseCase<Form, GetFormData.Params>(postExecutionThread) {
 
-    override fun buildUseCaseObservable(params: Nothing?): Observable<Form> {
-        return formRepository.getForm()
+    override fun buildUseCaseObservable(params: GetFormData.Params?): Observable<Form> {
+        if(params == null) throw IllegalArgumentException("params cannot be null")
+        return formRepository.parseFormData(params.string)
+    }
+
+    data class Params constructor(val string: String) {
+        companion object {
+            fun forProject(string: String): Params {
+                return Params(string)
+            }
+
+
+        }
     }
 
 }
