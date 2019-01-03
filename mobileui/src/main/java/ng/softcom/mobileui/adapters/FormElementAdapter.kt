@@ -1,7 +1,9 @@
 package ng.softcom.mobileui.adapters
 
 import android.app.DatePickerDialog
+import android.telephony.PhoneNumberFormattingTextWatcher
 import android.text.Editable
+import android.text.InputFilter
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioGroup
@@ -21,10 +23,10 @@ import java.util.*
 
 class FormElementAdapter(
     var items: List<FormElement>,
-    private val textWatcherListeners: (List<FormElement>) -> Unit
+    private val listenerItemsChanged: (List<FormElement>) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    val listeners = mutableListOf<SoftFormTextWatcher?>()
+    val formTextWatcherListeners = mutableListOf<SoftFormTextWatcher?>()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             YES_OR_NO -> {
@@ -92,9 +94,8 @@ class FormElementAdapter(
         private val inputLayout: TextInputLayout = itemView.findViewById(R.id.input_layout)
 
         fun bind(position: Int) = with(itemView) {
-//            inputText.setSelection(inputText.text.toString().length)
             val formElementText = items[position]
-            listeners.map { inputText.removeTextChangedListener(it) }
+            formTextWatcherListeners.map { inputText.removeTextChangedListener(it) }
 
             addTextWatcher(inputText, formElementText)
 
@@ -126,7 +127,7 @@ class FormElementAdapter(
                         applyRulesToFormElement(formElementYesOrNo.rules, "Yes")
                     else applyRulesToFormElement(formElementYesOrNo.rules, "No")
                 }
-                textWatcherListeners(items)
+                listenerItemsChanged(items)
             }
         }
     }
@@ -135,9 +136,8 @@ class FormElementAdapter(
         private val inputText: TextInputEditText = itemView.findViewById(R.id.input_text)
         private val inputLayout: TextInputLayout = itemView.findViewById(R.id.input_layout)
         fun bind(position: Int) = with(itemView) {
-//            inputText.setSelection(inputText.text.toString().length)
             val formElementDateAndTime = items[position]
-            listeners.map { inputText.removeTextChangedListener(it) }
+            formTextWatcherListeners.map { inputText.removeTextChangedListener(it) }
 
             addTextWatcher(inputText, formElementDateAndTime)
             changeFormElementVisibility(this, !formElementDateAndTime.isVisible)
@@ -178,9 +178,12 @@ class FormElementAdapter(
         private val inputText: TextInputEditText = itemView.findViewById(R.id.input_text)
         private val inputLayout: TextInputLayout = itemView.findViewById(R.id.input_layout)
         fun bind(position: Int) = with(itemView) {
-            inputText.setSelection(inputText.text.toString().length)
             val formElementNumeric = items[position]
-            listeners.map { inputText.removeTextChangedListener(it) }
+            val textLimit = (formElementNumeric as FormElementFormattedNumeric).formatPattern.length
+            inputText.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(textLimit))
+            inputText.addTextChangedListener(PhoneNumberFormattingTextWatcher())
+
+            formTextWatcherListeners.map { inputText.removeTextChangedListener(it) }
 
             addTextWatcher(inputText, formElementNumeric)
             changeFormElementVisibility(this, !formElementNumeric.isVisible)
@@ -227,22 +230,27 @@ class FormElementAdapter(
     }
 
 
-    fun addTextWatcher(inputText:TextInputEditText, formElement: FormElement){
+    fun addTextWatcher(inputText: TextInputEditText, formElement: FormElement) {
         val textWatcher = object : SoftFormTextWatcher() {
             override fun afterTextChanged(s: Editable?) {
-                super.afterTextChanged(s)
                 formElement.userResponse = FormResponse(stringResponse = s.toString())
-                textWatcherListeners(items)
+                if(formElement.formType == FormElementType.FORMATTED_NUMERIC && s.toString().isNotEmpty()){
+                    super.applyNumberFormatting((formElement as FormElementFormattedNumeric).formatPattern)
+                    super.afterTextChanged(s)
+                }
+                listenerItemsChanged(items)
                 applyRulesToFormElement(formElement.rules, s.toString())
             }
         }
 
+        formTextWatcherListeners.map { inputText.removeTextChangedListener(it) }
         inputText.setText(formElement.userResponse?.stringResponse ?: "")
+        inputText.setSelection(inputText.text.toString().length)
         inputText.addTextChangedListener(textWatcher)
-        listeners.add(textWatcher as SoftFormTextWatcher)
-
+        formTextWatcherListeners.add(textWatcher as SoftFormTextWatcher)
 
     }
+
     companion object {
         private const val YES_OR_NO = 1
         private const val TEXT = 2

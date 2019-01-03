@@ -1,8 +1,8 @@
 package ng.softcom.mobileui.adapters
 
-import android.util.Log
 import androidx.recyclerview.widget.DiffUtil
 import ng.softcom.models.FormElement
+import ng.softcom.models.FormElementType
 
 class FormDiffCallback(
     private val oldItems: List<FormElement>,
@@ -25,10 +25,14 @@ class FormDiffCallback(
         val oldFormElement = oldItems[oldItemPosition]
         val newFormElement = newItems[newItemPosition]
 
-        val areContentsSame = oldFormElement.isVisible == newFormElement.isVisible
+        var areContentsSame = oldFormElement.isVisible == newFormElement.isVisible
 
-        Log.e("tag", "contents are the same $areContentsSame")
-        return oldItems[oldItemPosition].isVisible == newItems[newItemPosition].isVisible
+        if(newFormElement.formType == FormElementType.FORMATTED_NUMERIC){
+            areContentsSame = (oldFormElement.userResponse?.stringResponse == newFormElement.userResponse?.stringResponse) && areContentsSame
+        }
+
+//        Log.e("tag", "contents are the same $areContentsSame")
+        return areContentsSame
 
     }
 
