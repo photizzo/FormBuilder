@@ -3,6 +3,9 @@ package ng.softcom.models
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
+/**
+ * model form class for the app
+ */
 data class Form(
     val label: String,
     var pages: List<FormPage>
@@ -24,7 +27,6 @@ enum class FormElementType {
 }
 
 open  class FormElement{
-    //using transient prevent gson from deserializing the variable
     open val label: String get() {return label}
     open val formType: FormElementType get() { return formType }
     open var uniqueId: String = ""
@@ -45,7 +47,7 @@ data class FormElementText(
     override val isMandatory: Boolean,
     @SerializedName("unique_id") override var uniqueId: String,
     override val rules: List<Rules?>
-) : FormElement() //FormElementType.TEXT, uniqueId, isMandatory, rules, isVisible)
+) : FormElement()
 
 data class FormElementYesOrNo(
     @Expose override var formType: FormElementType = FormElementType.YES_OR_NO,
@@ -53,13 +55,13 @@ data class FormElementYesOrNo(
     override val isMandatory: Boolean,
     @SerializedName("unique_id") override var uniqueId: String,
     override val rules: List<Rules?>
-) : FormElement() //FormElementType.YES_OR_NO, uniqueId, isMandatory, rules, isVisible)
+) : FormElement()
 
 data class FormElementEmbeddedPhoto(
     @Expose override var formType: FormElementType = FormElementType.EMBEDDED_PHOTO,
     val file: String,
     override val rules: List<Rules?>
-) : FormElement() // FormElementType.EMBEDDED_PHOTO)
+) : FormElement()
 
 data class FormElementFormattedNumeric(
     @Expose override var formType: FormElementType = FormElementType.FORMATTED_NUMERIC,
@@ -69,7 +71,7 @@ data class FormElementFormattedNumeric(
     override val isMandatory: Boolean,
     @SerializedName("unique_id") override var uniqueId: String,
     override val rules: List<Rules?>
-) : FormElement() //FormElementType.FORMATTED_NUMERIC, uniqueId, isMandatory, rules, isVisible)
+) : FormElement()
 
 data class FormElementDateAndTime(
     @Expose override var formType: FormElementType = FormElementType.DATE_TIME,
@@ -78,7 +80,7 @@ data class FormElementDateAndTime(
     override val isMandatory: Boolean,
     @SerializedName("unique_id") override var uniqueId: String,
     override val rules: List<Rules?>
-) : FormElement() //FormElementType.DATE_TIME, uniqueId, isMandatory, rules, isVisible)
+) : FormElement()
 
 data class Rules(
     val condition: String,

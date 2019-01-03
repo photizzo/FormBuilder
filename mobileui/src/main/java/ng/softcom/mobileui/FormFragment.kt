@@ -44,6 +44,9 @@ class FormFragment : Fragment() {
         return binding.root
     }
 
+    /**
+     * initializes view model for fragment
+     */
     private fun initViewModel() {
         getFormViewModel = activity?.run {
             ViewModelProviders.of(this).get(GetFormViewModel::class.java)
@@ -52,6 +55,9 @@ class FormFragment : Fragment() {
         initFormSectionRecyclerView()
     }
 
+    /**
+     * initialises form sections recyclerview
+     */
     private fun initFormSectionRecyclerView() {
         val llm = LinearLayoutManager(activity)
         binding.recyclerViewSection.layoutManager = llm
@@ -66,9 +72,7 @@ class FormFragment : Fragment() {
             binding.recyclerViewSection.visibility = View.VISIBLE
             binding.emptyView.visibility = View.GONE
         }
-        sectionAdapter = FormSectionAdapter(formSections) {
-            //doing nothing here in this listener
-        }
+        sectionAdapter = FormSectionAdapter(formSections)
         binding.recyclerViewSection.adapter = sectionAdapter
     }
 
@@ -81,7 +85,7 @@ class FormFragment : Fragment() {
             numberOfPages -> {
                 binding.includedFirstPageControl.buttonNext.visibility = View.GONE
                 binding.includedMiddlePageControl.parent.visibility = View.GONE
-                //check if form is a single page form only show submit button
+                //check if form is a single-page-form then show submit button
                 if (getFormViewModel.getCurrentPageLiveData().value == 1
                     && getFormViewModel.getFormLiveData().value?.data?.pages?.size == 1
                 )
@@ -126,6 +130,9 @@ class FormFragment : Fragment() {
         }
     }
 
+    /**
+     * checks if all mandatory questions has been answered
+     */
     private fun isAllMandatoryQuestionsAreAnsweredForCurrentPage(): Boolean {
         val allMandatoryQuestionsAnsweredList = mutableListOf<Boolean>()
         var allMandatoryQuestionsAnswered = false
@@ -144,6 +151,9 @@ class FormFragment : Fragment() {
         return !allMandatoryQuestionsAnsweredList.contains(false)
     }
 
+    /**
+     * updates the form viewmodel data with user form inputs
+     */
     private fun updateCurrentPageFormSectionsWithUserInput() {
         val currentPagePosition = arguments?.getInt(getString(R.string.page_position_key))
         getFormViewModel.getFormLiveData().value?.data!!.pages[currentPagePosition!!].section =

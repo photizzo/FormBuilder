@@ -1,6 +1,9 @@
 package ng.softcom.presentation.state
 
-
+/**
+ * An generic class for UI,
+ * it helps tell the change the state of the UI as the data changes
+ */
 class Resource<out T> constructor(val status: ResourceState,
                                   val data: T?,
                                   val message: String?) {

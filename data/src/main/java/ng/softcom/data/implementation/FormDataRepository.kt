@@ -8,6 +8,10 @@ import ng.softcom.domain.repository.FormRepository
 import ng.softcom.models.*
 import javax.inject.Inject
 
+/**
+ * source of data entry and manipulation in the app
+ * it implements all use cases defined in the @FormRepository class
+ */
 class FormDataRepository @Inject constructor() : FormRepository {
 
     override fun parseFormData(string: String): Observable<Form> {

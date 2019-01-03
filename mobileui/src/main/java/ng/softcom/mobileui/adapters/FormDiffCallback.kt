@@ -2,8 +2,11 @@ package ng.softcom.mobileui.adapters
 
 import androidx.recyclerview.widget.DiffUtil
 import ng.softcom.models.FormElement
-import ng.softcom.models.FormElementType
 
+/***
+ * handles when to update the recyclerview positions
+ * this is a more optimzed than using notifydataset changed
+ */
 class FormDiffCallback(
     private val oldItems: List<FormElement>,
     private val newItems: List<FormElement>)
@@ -27,9 +30,9 @@ class FormDiffCallback(
 
         var areContentsSame = oldFormElement.isVisible == newFormElement.isVisible
 
-        if(newFormElement.formType == FormElementType.FORMATTED_NUMERIC){
-            areContentsSame = (oldFormElement.userResponse?.stringResponse == newFormElement.userResponse?.stringResponse) && areContentsSame
-        }
+//        if(newFormElement.formType == FormElementType.FORMATTED_NUMERIC){
+//            areContentsSame = (oldFormElement.userResponse?.stringResponse == newFormElement.userResponse?.stringResponse) && areContentsSame
+//        }
 
 //        Log.e("tag", "contents are the same $areContentsSame")
         return areContentsSame

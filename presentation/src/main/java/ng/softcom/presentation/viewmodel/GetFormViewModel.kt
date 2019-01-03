@@ -11,6 +11,12 @@ import ng.softcom.presentation.state.Resource
 import ng.softcom.presentation.state.ResourceState
 import javax.inject.Inject
 
+/**
+ * this handles all data operations between the UI and the data layer
+ * it also helps preserve state when orientation changes occur
+ * @getFormData - GetFormData use case class
+ * @submitForm - SubmitForm use case class
+ */
 class GetFormViewModel @Inject internal constructor(
     private val getFormData: GetFormData,
     private val submitForm: SubmitForm) : ViewModel() {

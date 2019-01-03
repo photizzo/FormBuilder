@@ -6,6 +6,7 @@ import android.text.Editable
 import android.text.InputFilter
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
@@ -23,7 +24,7 @@ import java.util.*
 
 class FormElementAdapter(
     var items: List<FormElement>,
-    private val listenerItemsChanged: (List<FormElement>) -> Unit
+    private val formItemsChangedListener: (List<FormElement>) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     val formTextWatcherListeners = mutableListOf<SoftFormTextWatcher?>()
@@ -95,7 +96,6 @@ class FormElementAdapter(
 
         fun bind(position: Int) = with(itemView) {
             val formElementText = items[position]
-            formTextWatcherListeners.map { inputText.removeTextChangedListener(it) }
 
             addTextWatcher(inputText, formElementText)
 
@@ -110,6 +110,9 @@ class FormElementAdapter(
     inner class YesOrNoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val sectionNameTv: TextView = itemView.findViewById(R.id.textview_label)
         private val radioGroup: RadioGroup = itemView.findViewById(R.id.radiogroup_yes_or_no)
+        private val radioButtonYes: RadioButton = itemView.findViewById(R.id.radioButton_yes)
+        private val radioButtonNo: RadioButton = itemView.findViewById(R.id.radioButton_no)
+
         fun bind(position: Int) = with(itemView) {
             val formElementYesOrNo = items[position]
             changeFormElementVisibility(this, !formElementYesOrNo.isVisible)
@@ -118,7 +121,12 @@ class FormElementAdapter(
                 if (formElementYesOrNo.isMandatory!!) "*" else "" //let user know that field is mandatory
             sectionNameTv.text = "${formElementYesOrNo.label}  $mandatoryAsterisks"
 
-
+            //handles old user input on config changes
+            if(formElementYesOrNo.userResponse?.booleanResponse != null){
+                val isYes = formElementYesOrNo.userResponse!!.booleanResponse
+                if(isYes!!) radioButtonYes.isChecked = true else radioButtonNo.isChecked = true
+            }
+            
             radioGroup.setOnCheckedChangeListener { group, checkedId ->
                 formElementYesOrNo.userResponse = FormResponse(booleanResponse = checkedId == R.id.radioButton_yes)
 
@@ -127,7 +135,7 @@ class FormElementAdapter(
                         applyRulesToFormElement(formElementYesOrNo.rules, "Yes")
                     else applyRulesToFormElement(formElementYesOrNo.rules, "No")
                 }
-                listenerItemsChanged(items)
+                formItemsChangedListener(items)
             }
         }
     }
@@ -137,10 +145,9 @@ class FormElementAdapter(
         private val inputLayout: TextInputLayout = itemView.findViewById(R.id.input_layout)
         fun bind(position: Int) = with(itemView) {
             val formElementDateAndTime = items[position]
-            formTextWatcherListeners.map { inputText.removeTextChangedListener(it) }
-
             addTextWatcher(inputText, formElementDateAndTime)
             changeFormElementVisibility(this, !formElementDateAndTime.isVisible)
+
             //update form element label
             val mandatoryAsterisks =
                 if (formElementDateAndTime.isMandatory!!) "*" else "" //let user know that field is mandatory
@@ -179,11 +186,11 @@ class FormElementAdapter(
         private val inputLayout: TextInputLayout = itemView.findViewById(R.id.input_layout)
         fun bind(position: Int) = with(itemView) {
             val formElementNumeric = items[position]
+
+            //sets limit for input
             val textLimit = (formElementNumeric as FormElementFormattedNumeric).formatPattern.length
             inputText.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(textLimit))
             inputText.addTextChangedListener(PhoneNumberFormattingTextWatcher())
-
-            formTextWatcherListeners.map { inputText.removeTextChangedListener(it) }
 
             addTextWatcher(inputText, formElementNumeric)
             changeFormElementVisibility(this, !formElementNumeric.isVisible)
@@ -195,6 +202,11 @@ class FormElementAdapter(
         }
     }
 
+    /**
+     * apply page rules to entire form
+     * @rule - rule to be applied
+     * @value - value to makes the rules to be applied else it is ignored
+     */
     fun applyRulesToFormElement(rules: List<Rules?>, value: String) {
         val oldItemsList = mutableListOf<FormElement>()
         items.forEach {
@@ -224,12 +236,19 @@ class FormElementAdapter(
 
     }
 
+    /**
+     * change visibility of a form element
+     * @view - view to toggle visibility
+     * @status - visibility status
+     */
     fun changeFormElementVisibility(view: View, status: Boolean) {
         if (status) view.visibility = View.VISIBLE
         else view.visibility = View.GONE
     }
 
-
+    /**
+     * textwatcher for managing user text input
+     */
     fun addTextWatcher(inputText: TextInputEditText, formElement: FormElement) {
         val textWatcher = object : SoftFormTextWatcher() {
             override fun afterTextChanged(s: Editable?) {
@@ -238,7 +257,7 @@ class FormElementAdapter(
                     super.applyNumberFormatting((formElement as FormElementFormattedNumeric).formatPattern)
                     super.afterTextChanged(s)
                 }
-                listenerItemsChanged(items)
+                formItemsChangedListener(items)
                 applyRulesToFormElement(formElement.rules, s.toString())
             }
         }

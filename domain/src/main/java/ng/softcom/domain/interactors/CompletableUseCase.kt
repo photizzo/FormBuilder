@@ -7,9 +7,6 @@ import io.reactivex.observers.DisposableCompletableObserver
 import io.reactivex.schedulers.Schedulers
 import ng.softcom.domain.executors.PostExecutionThread
 
-/**
- * Created by Emem on 10/23/18.
- */
 abstract class CompletableUseCase<in Params> constructor(
         private val postExecutionThread: PostExecutionThread
 ) {

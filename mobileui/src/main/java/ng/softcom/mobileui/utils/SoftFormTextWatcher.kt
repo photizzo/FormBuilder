@@ -3,7 +3,11 @@ package ng.softcom.mobileui.utils
 import android.text.Editable
 import android.text.TextWatcher
 
-
+/**
+ * custom edittext watcher
+ * control formatting and updating of number format form elements
+ * minimized callbacks
+ */
 abstract class SoftFormTextWatcher : TextWatcher {
     private var isRunning = false
     private var isDeleting = false

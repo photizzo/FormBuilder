@@ -36,30 +36,31 @@ class FormActivity : DaggerAppCompatActivity() {
         initViewModel()
     }
 
+    /**
+     * initialize view model
+     */
     private fun initViewModel() {
         getFormViewModel = ViewModelProviders.of(this, viewModelFactory)
             .get(GetFormViewModel::class.java)
         getFormViewModel.getFormLiveData().observe(this, Observer<Resource<Form>> {
-            it?.let {
-                handleFormDataState(it)
-            }
+            it?.let { handleFormDataState(it) }
         })
         getFormViewModel.getSubmitFormLiveData().observe(this, Observer<Resource<Form>> {
-            it?.let {
-                handleSubmitFormData(it)
-            }
+            it?.let { handleSubmitFormData(it) }
         })
 
         getFormViewModel.getCurrentPageLiveData().observe(this, Observer<Int> {
-            it?.let {
-                handleCurrentPageDataState(it)
-            }
+            it?.let { handleCurrentPageDataState(it) }
         })
 
         val jsonString = readJsonFromFilePath("jsondata.json")
+        //check if form data is null before fetching data to help preserve data when config changes
         if(getFormViewModel.getFormLiveData().value?.data?.pages == null) getFormViewModel.getFormData(jsonString)
     }
 
+    /**
+     * handles how backpressed behaves for the view pager
+     */
     override fun onBackPressed() {
         if (binding.pager.currentItem == 0) {
             // If the user is currently looking at the first step, allow the system to handle the
@@ -67,7 +68,7 @@ class FormActivity : DaggerAppCompatActivity() {
             super.onBackPressed()
         } else {
             // Otherwise, select the previous step.
-            binding.pager.currentItem = binding.pager.currentItem - 1
+            getFormViewModel.decrementCurrentPage()
         }
     }
 
@@ -76,9 +77,7 @@ class FormActivity : DaggerAppCompatActivity() {
      */
     private inner class FormPagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {
 
-        override fun getCount(): Int {
-            return getFormViewModel.getFormLiveData().value?.data?.pages?.size!!
-        }
+        override fun getCount(): Int = getFormViewModel.getFormLiveData().value?.data?.pages?.size!!
 
         override fun getItem(position: Int): Fragment {
             val bundle = Bundle()
@@ -90,6 +89,9 @@ class FormActivity : DaggerAppCompatActivity() {
         }
     }
 
+    /**
+     * initializes view pager
+     */
     private fun initFormViewPager() {
         binding.pager.setMyScroller() //enable smooth scroll on non-swipeableViewPager
         // The pager adapter, which provides the pages to the view pager widget.
@@ -97,6 +99,10 @@ class FormActivity : DaggerAppCompatActivity() {
         binding.pager.adapter = pagerAdapter
     }
 
+    /**
+     * handles data when received from the view model
+     * all UI interactions when form changes are handled here
+     */
     private fun handleFormDataState(resource: Resource<Form>) {
         when (resource.status) {
             ResourceState.SUCCESS -> {
@@ -116,6 +122,11 @@ class FormActivity : DaggerAppCompatActivity() {
             }
         }
     }
+
+    /**
+     * handles data when received from the view model
+     * all UI interactions when form has been submitted happens here
+     */
     private fun handleSubmitFormData(resource: Resource<Form>) {
         when (resource.status) {
             ResourceState.SUCCESS -> {
@@ -131,6 +142,10 @@ class FormActivity : DaggerAppCompatActivity() {
         }
     }
 
+    /**
+     * handles data when received from the view model
+     * all UI interactions when current page data changes are handled here
+     */
     private fun handleCurrentPageDataState(pageNumber: Int) {
         val numOfPages = getFormViewModel.getFormLiveData().value?.data?.pages?.size
         binding.textViewPageNumber.text = "${pageNumber + 1}/$numOfPages"

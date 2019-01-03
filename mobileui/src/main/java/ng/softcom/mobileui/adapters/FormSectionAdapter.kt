@@ -13,8 +13,7 @@ import ng.softcom.models.FormSection
 
 
 class FormSectionAdapter(
-    val formSectionList: List<FormSection>,
-    private val listener: (FormSection) -> Unit
+    val formSectionList: List<FormSection>
 ) : RecyclerView.Adapter<FormSectionAdapter.ViewHolder>(){
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder{
